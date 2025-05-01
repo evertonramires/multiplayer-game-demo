@@ -5,7 +5,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, texture);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setBounce(0.2);
+    this.setBounce(0.5);
     this.setCollideWorldBounds(true);
     this.nametag = scene.add.text(0, 0, username, {
       fontSize: '16px',

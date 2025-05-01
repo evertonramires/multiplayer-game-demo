@@ -81,10 +81,14 @@ class MainScene extends Phaser.Scene {
     this.platforms.create(50, 250, 'ground');
     this.platforms.create(750, 220, 'ground');
 
+    // Create a ground platform at the bottom of the canvas
+    const ground = this.platforms.create(config.canvas.width / 2, config.canvas.height - 30, 'ground').setScale(5).refreshBody();
+    ground.setTintFill(0x808080); // grey tint
+
     // Create players
     const localUserId = this.nakamaService.session.user_id;
     this.players[localUserId] = new Player(this, 100, 450, 'dude', this.nakamaService.session.username, true);
-    this.localPlayer = this.players[localUserId];    
+    this.localPlayer = this.players[localUserId];
 
     // Replace stars group creation with Star class usage
     this.stars = this.physics.add.group({
@@ -126,6 +130,25 @@ class MainScene extends Phaser.Scene {
         scene: this
       });
     });
+
+    // Ensure stars and bombs collide with platforms
+    this.physics.add.collider(this.stars, this.platforms);
+    this.physics.add.collider(this.bombs, this.platforms);
+
+    // Game over screen setup
+    this.gameOverScreen = this.add.container(this.sys.game.config.width / 2, this.sys.game.config.height / 2);
+    this.gameOverScreen.setVisible(false);
+    const bg = this.add.rectangle(0, 0, 400, 200, 0x000000, 0.8);
+    const gameOverText = this.add.text(0, -40, 'Game Over', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+    const tryAgainButton = this.add.text(0, 40, 'Try Again', { fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    tryAgainButton.on('pointerdown', () => {
+      // Reset gameOver flag before restarting
+      this.gameOver = false;
+      this.scene.restart();
+    });
+    this.gameOverScreen.add([bg, gameOverText, tryAgainButton]);
   }
 
   update() {
@@ -148,6 +171,7 @@ class MainScene extends Phaser.Scene {
     player.setTint(0xff0000);
     player.anims.play('turn');
     this.gameOver = true;
+    this.gameOverScreen.setVisible(true);
   }
 }
 
