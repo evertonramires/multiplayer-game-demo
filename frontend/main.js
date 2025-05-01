@@ -6,6 +6,7 @@ import serverConfig from "./serverConfig.json";
 import Player from "./entities/player";
 import Star from "./entities/star";
 import Bomb from "./entities/bomb";
+import Menu from "./entities/menu";
 
 class NakamaService {
   constructor(config) {
@@ -135,20 +136,20 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.stars, this.platforms);
     this.physics.add.collider(this.bombs, this.platforms);
 
-    // Game over screen setup
-    this.gameOverScreen = this.add.container(this.sys.game.config.width / 2, this.sys.game.config.height / 2);
+
+
+
+    // Calls Menu when player dies
+    this.gameOverScreen = new Menu(
+      this,
+      this.sys.game.config.width / 2,
+      this.sys.game.config.height / 2,
+      () => {
+        this.gameOver = false;
+        this.scene.restart();
+      }
+    );
     this.gameOverScreen.setVisible(false);
-    const bg = this.add.rectangle(0, 0, 400, 200, 0x000000, 0.8);
-    const gameOverText = this.add.text(0, -40, 'Game Over', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
-    const tryAgainButton = this.add.text(0, 40, 'Try Again', { fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    tryAgainButton.on('pointerdown', () => {
-      // Reset gameOver flag before restarting
-      this.gameOver = false;
-      this.scene.restart();
-    });
-    this.gameOverScreen.add([bg, gameOverText, tryAgainButton]);
   }
 
   update() {
