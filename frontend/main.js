@@ -1,274 +1,177 @@
 import "./style.css";
 import Phaser from "phaser";
 import * as nakamajs from "@heroiclabs/nakama-js";
+import config from "./config.json";
+import Player from "./entities/player";
+import Star from "./entities/star";
+import Bomb from "./entities/bomb";
 
+class NakamaService {
+  constructor(config) {
+    this.client = new nakamajs.Client(
+      config.server.nakamaKey,
+      config.server.serverIp,
+      config.server.serverPort
+    );
+    this.client.ssl = false;
+    this.client.timeout = 10000;
+    this.session = null;
+    this.socket = null;
+    this.config = config;
+  }
 
-const nakamaKey = "defaultkey"
-const serverIp = "127.0.0.1"
-const serverPort = "7350"
+  async authenticate() {
+    try {
+      const { email, password, username } = this.config.debug;
+      // Authenticate with email and password
+      this.session = await this.client.authenticateEmail(email, password);
+      if (this.config.debug.verbose) {
+        console.log("Authenticated successfully:", this.session);
+        console.log("userId: ", this.session.user_id);
+        console.log("username: ", this.session.username);
+        console.log("email: ", email);
+        console.log("password: ", password);
+      }
+      return this.session;
+    } catch (error) {
+      if (this.config.debug.verbose) console.error("Authentication failed:", error);
+      throw error;
+    }
+  }
 
-var client = new nakamajs.Client(nakamaKey, serverIp, serverPort);
-client.ssl = false; // unless you have SSL configured
-client.timeout = 10000;
-
-// ############## AUTHENTICATION ##############
-
-var userId = "";
-
-var username = "pequenourso";
-var email = "pequenourso@gmail.com";
-var password = "Pequenourso123";
-
-// var username = "grandecoruja";
-// var email = "grandecoruja@gmail.com";
-// var password = "Grandecoruja123";
-
-// var username = "calangomedio";
-// var email = "calangomedio@gmail.com";
-// var password = "Calangomedio123";
-
-
-let session;
-
-
-try {
-
-    // ####### Creates username if it doesn't exist #######
-  session = await client.authenticateEmail(email, password, true, username);
-
-  // Authenticate with email and password
-  // session = await client.authenticateEmail(email, password);
-
-  username = session.username;
-  userId = session.user_id;
-
-  console.log("Authenticated successfully:", session);
-  console.log("userId: ", userId);
-  console.log("username: ", username);
-  console.log("email: ", email);
-  console.log("password: ", password);
-
-} catch (error) {
-  console.error("Authentication failed:", error);
+  async connectSocket() {
+    this.socket = this.client.createSocket();
+    await this.socket.connect(this.session, true);
+    return this.socket;
+  }
 }
 
+class MainScene extends Phaser.Scene {
+  constructor(nakamaService, config) {
+    super({ key: 'MainScene' });
+    this.nakamaService = nakamaService;
+    this.configData = config;
+    this.players = {};
+    this.stars = null;
+    this.bombs = null;
+    this.platforms = null;
+    this.score = 0;
+    this.gameOver = false;
+    this.scoreText = null;
+  }
 
-
-const socket = client.createSocket();
-
-var appearOnline = true;
-await socket.connect(session, appearOnline);
-
-
-
-
-
-// ############## GAME START ##############
-const sizes = {
-  width: 500,
-  height: 500,
-};
-
-const speedDown = 300
-
-const config = {
-  type: Phaser.WEBGL,
-  width: sizes.width,
-  height: sizes.height,
-  canvas: gameCanvas,
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: speedDown },
-      debug: true,
-    },
-  },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
-
-var player;
-var stars;
-var bombs;
-var platforms;
-var cursors;
-var score = 0;
-var gameOver = false;
-var scoreText;
-
-var game = new Phaser.Game(config);
-
-function preload ()
-{
+  preload() {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-}
+  }
 
-function create ()
-{
-    //  A simple background for our game
-    this.add.image(400, 300, 'sky');
+  create() {
+    // Add background image stretched to fill the entire canvas
+    this.add.image(0, 0, 'sky')
+      .setOrigin(0, 0)
+      .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = this.physics.add.staticGroup();
+    this.platforms = this.physics.add.staticGroup();
+    this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    this.platforms.create(600, 400, 'ground');
+    this.platforms.create(50, 250, 'ground');
+    this.platforms.create(750, 220, 'ground');
 
-    //  Here we create the ground.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    // Create players
+    const localUserId = this.nakamaService.session.user_id;
+    this.players[localUserId] = new Player(this, 100, 450, 'dude', this.nakamaService.session.username, true);
+    this.localPlayer = this.players[localUserId];
+    this.players['remote1'] = new Player(this, 300, 450, 'dude', 'RemoteUser1', true);
+    this.players['remote2'] = new Player(this, 500, 450, 'dude', 'RemoteUser2', true);
+    
 
-    //  Now let's create some ledges
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
-
-    player = this.physics.add.sprite(100, 450, 'dude');
-
-    // Add nametag above player
-    const nametag = this.add.text(0, 0, session.username, {
-      fontSize: '16px',
-      fill: '#fff',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      padding: { left: 4, right: 4, top: 2, bottom: 2 }
+    // Replace stars group creation with Star class usage
+    this.stars = this.physics.add.group({
+      classType: Star,
+      maxSize: 12,
+      runChildUpdate: false
     });
-    nametag.setOrigin(0.5, 1);
-
-    // Update nametag position every frame
-    this.events.on('update', () => {
-      nametag.x = player.x;
-      nametag.y = player.y - player.displayHeight / 2 - 8;
-    });
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [ { key: 'dude', frame: 4 } ],
-      frameRate: 20
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    //  Input Events
-    cursors = this.input.keyboard.createCursorKeys();
-
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    stars = this.physics.add.group({
-        key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
-
-    stars.children.iterate(function (child) {
-
-        //  Give each star a slightly different bounce
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    });
-
-    bombs = this.physics.add.group();
-
-    //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    //  Collide the player and the stars with the platforms
-    this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
-
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
-
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
-}
-
-function update ()
-{
-    if (gameOver)
-    {
-        return;
+    for (let i = 0; i < 12; i++) {
+      const star = this.stars.get(12 + i * 70, 0);
+      if (star) {
+        star.setActive(true);
+        star.setVisible(true);
+      }
     }
 
-    if (cursors.left.isDown)
-    {
-        player.setVelocityX(-160);
-
-        player.anims.play('left', true);
-    }
-    else if (cursors.right.isDown)
-    {
-        player.setVelocityX(160);
-
-        player.anims.play('right', true);
-    }
-    else
-    {
-        player.setVelocityX(0);
-
-        player.anims.play('turn');
+    this.bombs = this.physics.add.group({
+      classType: Bomb,
+      maxSize: 3,
+      runChildUpdate: false
+    });
+    // Spawn 3 bombs at random positions
+    for (let i = 0; i < 3; i++) {
+      const x = Phaser.Math.Between(0, this.sys.game.config.width);
+      const bomb = this.bombs.get(x, 16);
+      if (bomb) {
+        bomb.setActive(true);
+        bomb.setVisible(true);
+      }
     }
 
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
+    this.scoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#000' });
+
+    // Colliders for all players
+    Object.values(this.players).forEach(player => {
+      player.setupColliders({
+        platforms: this.platforms,
+        stars: this.stars,
+        bombs: this.bombs,
+        scene: this
+      });
+    });
+  }
+
+  update() {
+    if (this.gameOver) return;
+    if (this.localPlayer) this.localPlayer.update();
+    // Build a scoreboard string with all players
+    if (this.scoreText) {
+      let scoreboard = '';
+      const playerList = Object.values(this.players);
+      playerList.forEach((player, idx) => {
+        scoreboard += `${player.nametag.text}: ${player.score}`;
+        if (idx < playerList.length - 1) scoreboard += '\n';
+      });
+      this.scoreText.setText(scoreboard);
     }
-}
+  }
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
-    }
-}
-
-function hitBomb (player, bomb)
-{
+  hitBomb(player, bomb) {
     this.physics.pause();
-
     player.setTint(0xff0000);
-
     player.anims.play('turn');
-
-    gameOver = true;
+    this.gameOver = true;
+  }
 }
+
+async function startGame() {
+  const nakamaService = new NakamaService(config);
+  await nakamaService.authenticate();
+  await nakamaService.connectSocket();
+  const gameConfig = {
+    type: Phaser.WEBGL,
+    width: config.canvas.width - config.canvas.margin * 2,
+    height: config.canvas.height - config.canvas.margin * 2,
+    canvas: gameCanvas,
+    physics: {
+      default: "arcade",
+      arcade: {
+        gravity: { y: config.physics.gravity },
+        debug: config.showColiders,
+      },
+    },
+    scene: new MainScene(nakamaService, config)
+  };
+  new Phaser.Game(gameConfig);
+}
+
+startGame();

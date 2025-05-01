@@ -1,0 +1,25 @@
+{
+    "debug": {
+        "showColiders": true,
+        "verbose": false,
+        "username": "pequenourso",
+        "email": "pequenourso@gmail.com",
+        "password": "Pequenourso123"
+    },
+    "canvas": {
+        "width": 1280,
+        "height": 720,
+        "margin": 50
+    },
+    "physics": {
+        "gravity": 300,
+        "friction": 0.1,
+        "bounce": 0.5
+    },
+    "server": {
+        "nakamaKey": "defaultkey",
+        "serverIp": "127.0.0.1",
+        "serverPort": 7350
+    }
+}
+
