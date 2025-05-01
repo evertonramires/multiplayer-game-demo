@@ -2,6 +2,7 @@ import "./style.css";
 import Phaser from "phaser";
 import * as nakamajs from "@heroiclabs/nakama-js";
 import config from "./config.json";
+import serverConfig from "./serverConfig.json";
 import Player from "./entities/player";
 import Star from "./entities/star";
 import Bomb from "./entities/bomb";
@@ -9,9 +10,9 @@ import Bomb from "./entities/bomb";
 class NakamaService {
   constructor(config) {
     this.client = new nakamajs.Client(
-      config.server.nakamaKey,
-      config.server.serverIp,
-      config.server.serverPort
+      serverConfig.nakamaKey,
+      serverConfig.serverIp,
+      serverConfig.serverPort
     );
     this.client.ssl = false;
     this.client.timeout = 10000;
@@ -83,10 +84,7 @@ class MainScene extends Phaser.Scene {
     // Create players
     const localUserId = this.nakamaService.session.user_id;
     this.players[localUserId] = new Player(this, 100, 450, 'dude', this.nakamaService.session.username, true);
-    this.localPlayer = this.players[localUserId];
-    this.players['remote1'] = new Player(this, 300, 450, 'dude', 'RemoteUser1', true);
-    this.players['remote2'] = new Player(this, 500, 450, 'dude', 'RemoteUser2', true);
-    
+    this.localPlayer = this.players[localUserId];    
 
     // Replace stars group creation with Star class usage
     this.stars = this.physics.add.group({
