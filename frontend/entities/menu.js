@@ -5,9 +5,9 @@ export default class Menu extends Phaser.GameObjects.Container {
     super(scene, x, y);
     scene.add.existing(this);
     this.setVisible(false);
-    const bg = scene.add.rectangle(0, 0, 400, 200, 0x000000, 0.8);
-    const gameOverText = scene.add.text(0, -40, 'Menu', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
-    const tryAgainButton = scene.add.text(0, 40, 'New Game', { fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
+    const bg = scene.add.rectangle(0, 0, 400, 400, 0x000000, 0.8);
+    const gameOverText = scene.add.text(0, -150, 'Menu', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+    const tryAgainButton = scene.add.text(0, -80, 'New Game', { fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     tryAgainButton.on('pointerdown', () => {
@@ -15,7 +15,7 @@ export default class Menu extends Phaser.GameObjects.Container {
     });
 
     // New Match button
-    const createMatchButton = scene.add.text(0, 100, 'Create New Match', { fontSize: '28px', fill: '#fff', backgroundColor: '#28a745', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
+    const createMatchButton = scene.add.text(0, 0, 'Create New Match', { fontSize: '28px', fill: '#fff', backgroundColor: '#28a745', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     createMatchButton.on('pointerdown', async () => {
@@ -23,20 +23,11 @@ export default class Menu extends Phaser.GameObjects.Container {
     });
 
     // Join Match button
-    const joinMatchButton = scene.add.text(0, 160, 'Join Match', { fontSize: '28px', fill: '#fff', backgroundColor: '#ffc107', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
+    const joinMatchButton = scene.add.text(0, 80, 'Join Match', { fontSize: '28px', fill: '#fff', backgroundColor: '#ffc107', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     joinMatchButton.on('pointerdown', async () => {
-      const matchId = prompt('Enter Match ID to join:');
-      console.log('Entered Match ID:', matchId);
-      if (matchId && scene.nakamaService && scene.nakamaService.socket) {
-        try {
-          const match = await scene.nakamaService.socket.joinMatch(matchId);
-          console.log('Joined match:', match);
-        } catch (error) {
-          console.error('Failed to join match:', error);
-        }
-      }
+      await this.joinMatch(scene);
     });
 
     this.add([bg, gameOverText, tryAgainButton, createMatchButton, joinMatchButton]);
@@ -55,6 +46,19 @@ export default class Menu extends Phaser.GameObjects.Container {
         console.log("Match created:", match);
       } catch (error) {
         console.error("Failed to create match:", error);
+      }
+    }
+  }
+
+  async joinMatch(scene) {
+    const matchId = prompt('Enter Match ID to join:');
+    console.log('Entered Match ID:', matchId);
+    if (matchId && scene.nakamaService && scene.nakamaService.socket) {
+      try {
+        const match = await scene.nakamaService.socket.joinMatch(matchId);
+        console.log('Joined match:', match);
+      } catch (error) {
+        console.error('Failed to join match:', error);
       }
     }
   }

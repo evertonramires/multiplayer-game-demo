@@ -7,6 +7,7 @@ import Player from "./entities/player";
 import Star from "./entities/star";
 import Bomb from "./entities/bomb";
 import Menu from "./entities/menu";
+import Hud from "./entities/hud";
 
 class NakamaService {
   constructor(config) {
@@ -120,7 +121,8 @@ class MainScene extends Phaser.Scene {
       }
     }
 
-    this.scoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#000' });
+    // HUD overlay
+    this.hud = new Hud(this);
 
     // Colliders for all players
     Object.values(this.players).forEach(player => {
@@ -155,16 +157,7 @@ class MainScene extends Phaser.Scene {
   update() {
     if (this.gameOver) return;
     if (this.localPlayer) this.localPlayer.update();
-    // Build a scoreboard string with all players
-    if (this.scoreText) {
-      let scoreboard = '';
-      const playerList = Object.values(this.players);
-      playerList.forEach((player, idx) => {
-        scoreboard += `${player.nametag.text}: ${player.score}`;
-        if (idx < playerList.length - 1) scoreboard += '\n';
-      });
-      this.scoreText.setText(scoreboard);
-    }
+
   }
 
   hitBomb(player, bomb) {
