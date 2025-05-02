@@ -118,10 +118,11 @@ class System {
 
 
 
-  static async syncMatchStatus(state) {
+  static async syncMatchStatus(stateToSend) {
     // console.log("Sending match state:");
     // console.log(state)
-    System.socket.sendMatchState(System.match.match_id, 1, "banana");
+    const stateToSendString = JSON.stringify(stateToSend);
+    System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
 
     System.socket.onmatchdata = async (result) => {
       console.log("Received match state: \n");
