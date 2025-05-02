@@ -6,6 +6,7 @@ import Bomb from "../entities/bomb";
 import Menu from "../entities/menu";
 import Hud from "../entities/hud";
 import System from "../entities/system";
+import Patients from "../entities/patients";
 
 export default class MainScene extends Phaser.Scene {
   
@@ -24,7 +25,9 @@ export default class MainScene extends Phaser.Scene {
       this.load.image('ground', 'assets/platform.png');
       this.load.image('star', 'assets/star.png');
       this.load.image('bomb', 'assets/bomb.png');
+      this.load.image('paciente', 'assets/pacienteGrave.png');
       this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+      this.load.spritesheet('nurse', 'assets/nurse.png', { frameWidth: 1, frameHeight: 1 });
     }
 
     create() {
@@ -42,6 +45,24 @@ export default class MainScene extends Phaser.Scene {
     // Create a ground platform at the bottom of the canvas
     const ground = this.platforms.create(System.config.canvas.width / 2, System.config.canvas.height - 30, 'ground').setScale(5).refreshBody();
     ground.setTintFill(0x808080); // grey tint
+
+    // Patients
+    this.patients = this.physics.add.group({
+      classType: Patients,
+      maxSize: 5,
+      runChildUpdate: true
+    }); 
+
+    for (let i = 0; i < 3; i++) {
+      const x = Phaser.Math.Between(100, 700);
+      const y = Phaser.Math.Between(100, 400);
+      const obj = this.patients.get(x, y, 'paciente');
+      if (obj) {
+          obj.setActive(true);
+          obj.setVisible(true);
+          obj.setScale(0.5);
+      }
+  }
 
     this.localPlayer = new Player(this, 100, 500, 'dude');
 
@@ -92,8 +113,8 @@ export default class MainScene extends Phaser.Scene {
     // Ensure stars and bombs collide with platforms
     this.physics.add.collider(this.stars, this.platforms);
     this.physics.add.collider(this.bombs, this.platforms);
-
-
+    this.physics.add.collider(this.patients, this.platforms);
+    this.physics.add.collider(this.localPlayer, this.patients);
 
 
     // Calls Menu when player dies
@@ -113,7 +134,9 @@ export default class MainScene extends Phaser.Scene {
     if (this.gameOver) return;
     if (this.localPlayer) this.localPlayer.update();
 
-
+    this.patients.children.iterate(patient => {
+      if (patient && patient.update) patient.update();
+    });    
 
     // Update HUD overlay with latest match and player info
     if (System.match) {
