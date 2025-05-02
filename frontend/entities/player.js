@@ -18,6 +18,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.createAnimations(scene);
     this.cursors = scene.input.keyboard.createCursorKeys();
 
+    this.patients = scene.patients; // Grupo de objetos seguráveis
+    this.heldObject = null; // Objeto atualmente segurado
+    this.interactKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E); // Tecla para interagir
+
   }
 
   createAnimations(scene) {
@@ -45,6 +49,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       });
     }
   }
+
+  tryInteract() {
+    if (this.heldObject) {
+        // Solta o objeto se já estiver segurando algo
+        this.heldObject.release();
+        this.heldObject = null;
+    } else {
+        // Procura por objetos seguráveis próximos
+        this.patients.getChildren().forEach(obj => {
+            if (Phaser.Math.Distance.Between(this.x, this.y, obj.x, obj.y) < 50) {
+                this.heldObject = obj;
+                obj.beHeldBy(this);
+                return;
+            }
+        });
+    }
+}
 
   update() {
     if (!this.active) return;
@@ -82,6 +103,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       } else {
         this.anims.play('turn');
       }
+    }
+    
+    if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+      this.tryInteract();
     }
   }
 
