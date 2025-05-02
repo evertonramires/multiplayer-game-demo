@@ -12,7 +12,7 @@ export default class Hud extends Phaser.GameObjects.Container {
       50,
       50,
       'No data',
-      { fontSize: '30px', fill: '#ff0', fontStyle: 'bold'}
+      { fontSize: '15px', fill: '#ff0000', fontStyle: 'bold'}
     )
     this.add(this.debugOverlay);
   }
