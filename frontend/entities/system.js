@@ -69,7 +69,7 @@ if (matchId) {
     this.config = config;
 
     try {
-      const { email, password, username } = this.config.debug;
+      const { email, password, username } = serverConfig;
       // Authenticate with email and password
       this.session = await this.client.authenticateEmail(email, password);
       if (this.config.debug.verbose) {
