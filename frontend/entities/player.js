@@ -55,22 +55,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
       let velocityX = 0;
       let velocityY = 0;
-  
+
       if (this.cursors.left.isDown) {
         velocityX = -160;
       } else if (this.cursors.right.isDown) {
         velocityX = 160;
       }
-  
+
       if (this.cursors.up.isDown) {
         velocityY = -160;
       } else if (this.cursors.down.isDown) {
         velocityY = 160;
       }
-  
+
       this.setVelocityX(velocityX);
       this.setVelocityY(velocityY);
-  
+
       if (velocityX < 0) {
         this.anims.play('left', true);
       } else if (velocityX > 0) {
