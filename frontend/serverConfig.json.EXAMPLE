@@ -1,5 +1,8 @@
      {
         "nakamaKey": "defaultkey",
         "serverIp": "127.0.0.1",
-        "serverPort": 7350
+        "serverPort": 7350,
+        "username": "pequenourso",
+        "email": "pequenourso@gmail.com",
+        "password": "Pequenourso123"
     }
