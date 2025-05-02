@@ -20,7 +20,7 @@ class System {
     physics: {
       default: "arcade",
       arcade: {
-        gravity: { y: System.config.physics.gravity },
+        gravity: { y: 0},
         debug: System.config.showColiders,
       },
     }
