@@ -6,7 +6,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, texture);
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setBounce(0.5);
+    this.setBounce(0);
     this.setCollideWorldBounds(true);
     this.nametag = scene.add.text(0, 0, System.session.username, {
       fontSize: '16px',
@@ -52,18 +52,35 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.updateNametag();
     // Only local player handles input
     if (this.cursors) {
+
+      let velocityX = 0;
+      let velocityY = 0;
+  
       if (this.cursors.left.isDown) {
-        this.setVelocityX(-160);
-        this.anims.play('left', true);
+        velocityX = -160;
       } else if (this.cursors.right.isDown) {
-        this.setVelocityX(160);
-        this.anims.play('right', true);
-      } else {
-        this.setVelocityX(0);
-        this.anims.play('turn');
+        velocityX = 160;
       }
-      if (this.cursors.up.isDown && this.body.touching.down) {
-        this.setVelocityY(-330);
+  
+      if (this.cursors.up.isDown) {
+        velocityY = -160;
+      } else if (this.cursors.down.isDown) {
+        velocityY = 160;
+      }
+  
+      this.setVelocityX(velocityX);
+      this.setVelocityY(velocityY);
+  
+      if (velocityX < 0) {
+        this.anims.play('left', true);
+      } else if (velocityX > 0) {
+        this.anims.play('right', true);
+      } else if (velocityY < 0) {
+        this.anims.play('up', true);
+      } else if (velocityY > 0) {
+        this.anims.play('down', true);
+      } else {
+        this.anims.play('turn');
       }
     }
   }

@@ -20,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
 
     preload() {
       this.load.image('sky', 'assets/sky.png');
+      this.load.image('hospital', 'assets/hospital.png');
       this.load.image('ground', 'assets/platform.png');
       this.load.image('star', 'assets/star.png');
       this.load.image('bomb', 'assets/bomb.png');
@@ -28,7 +29,7 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
     // Add background image stretched to fill the entire canvas
-    this.add.image(0, 0, 'sky')
+    this.add.image(0, 0, 'hospital')
       .setOrigin(0, 0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
@@ -42,7 +43,7 @@ export default class MainScene extends Phaser.Scene {
     const ground = this.platforms.create(System.config.canvas.width / 2, System.config.canvas.height - 30, 'ground').setScale(5).refreshBody();
     ground.setTintFill(0x808080); // grey tint
 
-    this.localPlayer = new Player(this, 100, 450, 'dude');
+    this.localPlayer = new Player(this, 100, 500, 'dude');
 
     // Replace stars group creation with Star class usage
     this.stars = this.physics.add.group({
