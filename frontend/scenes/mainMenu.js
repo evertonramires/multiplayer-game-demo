@@ -33,8 +33,8 @@ export default class MainMenu extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });
         joinBtn.on('pointerdown', async () => {
-            await System.joinMatch();
-            this.scene.start('MainScene', { action: 'join' });
+            let hasMatch = await System.joinMatch();
+            if (hasMatch) this.scene.start('MainScene', { action: 'join' });
         });
     }
 }

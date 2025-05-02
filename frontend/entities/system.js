@@ -27,25 +27,36 @@ class System {
   };
 
   static async createNewMatch() {
-      try {
-        const matchName = "NoImpostersAllowed";
-        System.match = await this.socket.createMatch(matchName);
-        console.log("Match created:", System.match);
-      } catch (error) {
-        console.error("Failed to create match:", error);
-      }
+    try {
+      const matchName = "NoImpostersAllowed";
+      System.match = await this.socket.createMatch(matchName);
+      console.log("Match created:", System.match);
+    } catch (error) {
+      console.error("Failed to create match:", error);
+    }
   }
 
   static async joinMatch() {
     const matchId = prompt('Enter Match ID to join:');
     console.log('Entered Match ID:', matchId);
-      try {
-        System.match = await this.socket.joinMatch(matchId);
-        console.log('Joined match:', System.match);
-      } catch (error) {
-        console.error('Failed to join match:', error);
-      }
+if (matchId) {
+    console.log("there is a matchId: " + matchId);
+    try {
+      System.match = await this.socket.joinMatch(matchId);
+      console.log('Joined match:', System.match);
+      return true;
+    } catch (error) {
+      console.error('Failed to join match:', error);
+      window.alert('Failed to join match. Please check the Match ID and try again.');
+      return false;
+    }
   }
+  else {
+    console.log("No matchId provided.");
+    // window.alert('No Match ID provided. Please enter a valid Match ID.');
+    return false;
+  }
+}
 
   static async init() {
     this.client = new nakamajs.Client(

@@ -32,12 +32,13 @@ export default class Menu extends Phaser.GameObjects.Container {
       await System.joinMatch();
     });
 
-    // Back to Main Menu button
     const backToMenuButton = scene.add.text(0, 160, 'Back to Main Menu', { fontSize: '28px', fill: '#fff', backgroundColor: '#dc3545', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     backToMenuButton.on('pointerdown', () => {
-      scene.scene.start('MainMenu');
+      if (window.confirm('Are you sure you want to leave to the main menu? Unsaved progress will be lost.')) {
+        scene.scene.start('MainMenu');
+      }
     });
 
     this.add([bg, gameOverText, tryAgainButton, createMatchButton, joinMatchButton, backToMenuButton]);
