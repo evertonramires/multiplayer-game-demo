@@ -12,6 +12,7 @@ class System {
   static session = null;
   static config = config;
   static playersList = [];
+  static playersState = [];
 
   static engineConfig = {
     type: Phaser.WEBGL,
@@ -125,12 +126,12 @@ class System {
     System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
 
     System.socket.onmatchdata = async (result) => {
-      console.log("Received match state: \n");
-      console.log(result); // Vai mostrar o Uint8Array
+      // console.log("Received match state: \n");
+      // console.log(result); // Vai mostrar o Uint8Array
       const remoteData = result.data ? result.data : null;
       const remoteId = result.presence.user_id ? result.presence.user_id : null;
       const remoteName = result.presence.username ? result.presence.username : null;
-      console.log("Received from: ", remoteId, remoteName);
+      // console.log("Received from: ", remoteId, remoteName);
 
       if (remoteData) {
 
@@ -141,8 +142,21 @@ class System {
         // Faz o parse do JSON
         const receivedData = JSON.parse(jsonString);
 
-        console.log("Parsed match state: \n");
-        console.log(receivedData);
+        // console.log("Parsed match state: \n");
+        // console.log(receivedData);
+        const playerIndex = System.playersState.findIndex(
+          (ply) => ply.player_id === receivedData.player_id
+        );
+
+        if (playerIndex !== -1) {
+          // Update existing player data
+          System.playersState[playerIndex] = { ...System.playersState[playerIndex], ...receivedData };
+        } else {
+          // Add new player entry
+          System.playersState.push(receivedData);
+        }
+        // console.log("Updated players state: \n");
+        // console.log(System.playersState);
       }
     };
 
