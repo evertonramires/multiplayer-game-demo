@@ -114,6 +114,17 @@ class System {
     return playersList;
   }
 
+
+
+
+
+  static async syncMatchStatus(state) {
+    console.log("Syncing match status");
+    // console.log(state)
+    System.socket.sendMatchState(System.match.match_id, 0, JSON.stringify(state));
+    // console.log(System.socket)
+  }
+
   static async init() {
     this.client = new nakamajs.Client(
       serverConfig.nakamaKey,
@@ -143,6 +154,7 @@ class System {
     this.socket = this.client.createSocket();
     await this.socket.connect(this.session, true);
   }
+  
 }
 
 export default System;

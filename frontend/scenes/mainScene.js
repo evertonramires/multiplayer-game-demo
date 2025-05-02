@@ -7,17 +7,18 @@ import Menu from "../entities/menu";
 import Hud from "../entities/hud";
 import System from "../entities/system";
 import Patients from "../entities/patients";
+import PlayerInMatch from "../entities/match";
 
 export default class MainScene extends Phaser.Scene {
-  
-    constructor() {
-      super({ key: 'MainScene' });
-      this.configData = System.config;
-      this.stars = null;
-      this.bombs = null;
-      this.platforms = null;
-      this.gameOver = false;
-    }
+
+  constructor() {
+    super({ key: 'MainScene' });
+    this.configData = System.config;
+    this.stars = null;
+    this.bombs = null;
+    this.platforms = null;
+    this.gameOver = false;
+  }
 
     preload() {
       this.load.image('sky', 'assets/sky.png');
@@ -30,7 +31,7 @@ export default class MainScene extends Phaser.Scene {
       this.load.spritesheet('nurse', 'assets/nurse.png', { frameWidth: 1, frameHeight: 1 });
     }
 
-    create() {
+  create() {
     // Add background image stretched to fill the entire canvas
     this.add.image(0, 0, 'hospital')
       .setOrigin(0, 0)
@@ -102,12 +103,12 @@ export default class MainScene extends Phaser.Scene {
 
     // Set Player collider
     if (this.localPlayer) {
-        this.localPlayer.setupColliders({
-            platforms: this.platforms,
-            stars: this.stars,
-            bombs: this.bombs,
-            scene: this
-        });
+      this.localPlayer.setupColliders({
+        platforms: this.platforms,
+        stars: this.stars,
+        bombs: this.bombs,
+        scene: this
+      });
     }
 
     // Ensure stars and bombs collide with platforms
@@ -130,7 +131,7 @@ export default class MainScene extends Phaser.Scene {
     this.menuScreen.setVisible(false);
   }
 
-  update() {
+  async update() {
     if (this.gameOver) return;
     if (this.localPlayer) this.localPlayer.update();
 
@@ -150,6 +151,19 @@ export default class MainScene extends Phaser.Scene {
         );
       }
     }
+
+
+
+
+    
+    var state = new PlayerInMatch;
+    state.playerId = System.session.user_id;
+    state.playerName = System.session.username;
+    state.playerX = this.localPlayer.x;
+    state.playerY = this.localPlayer.y;
+    
+    System.syncMatchStatus(state);
+
   }
 
   hitBomb(player, bomb) {
