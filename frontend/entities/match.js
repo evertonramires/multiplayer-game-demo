@@ -1,11 +1,8 @@
 import System from "./system";
 
-export default class PlayerInMatch {
+export default class PositionState {
 
     static x;
     static y;
     static z;
-
-    static playerId;
-    static playerName;
 }

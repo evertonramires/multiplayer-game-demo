@@ -119,18 +119,20 @@ class System {
 
 
   static async syncMatchStatus(state) {
-    console.log("Syncing match status");
-    // console.log(state)
-    System.socket.sendMatchState(System.match.match_id, 0, JSON.stringify(state));
+    console.log("Sending match state:");
+    console.log(state)
+    System.socket.sendMatchState(System.match.match_id, 1, JSON.stringify(state));
     // console.log(System.socket)
 
     System.socket.onmatchdata = (matchState) => {
       console.log("Received match state: \n");
 
       // Get the updated position data
-      var stateJson = matchState.state;
-      var positionState = JSON.parse(stateJson);
-      console.log(positionState);
+      if (matchState) {
+        console.log(matchState);
+        // var stateJson = receivedState;
+        // var positionState = JSON.parse(stateJson);
+      }
     };
 
 

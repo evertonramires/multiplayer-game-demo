@@ -7,7 +7,7 @@ import Menu from "../entities/menu";
 import Hud from "../entities/hud";
 import System from "../entities/system";
 import Patients from "../entities/patients";
-import PlayerInMatch from "../entities/match";
+import PositionState from "../entities/match";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -156,7 +156,7 @@ export default class MainScene extends Phaser.Scene {
 
 
     
-    var state = new PlayerInMatch;
+    var state = new PositionState;
     state.playerId = System.session.user_id;
     state.playerName = System.session.username;
     state.playerX = this.localPlayer.x;
