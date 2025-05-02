@@ -1,8 +1,10 @@
 import Phaser from "phaser";
+import System from "./system";
 
 export default class Menu extends Phaser.GameObjects.Container {
   constructor(scene, x, y, onTryAgain) {
     super(scene, x, y);
+
     scene.add.existing(this);
     this.setVisible(false);
     const bg = scene.add.rectangle(0, 0, 400, 400, 0x000000, 0.8);
@@ -19,7 +21,7 @@ export default class Menu extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     createMatchButton.on('pointerdown', async () => {
-      await this.createNewMatch(scene);
+      await System.createNewMatch();
     });
 
     // Join Match button
@@ -27,39 +29,22 @@ export default class Menu extends Phaser.GameObjects.Container {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
     joinMatchButton.on('pointerdown', async () => {
-      await this.joinMatch(scene);
+      await System.joinMatch();
     });
 
-    this.add([bg, gameOverText, tryAgainButton, createMatchButton, joinMatchButton]);
+    // Back to Main Menu button
+    const backToMenuButton = scene.add.text(0, 160, 'Back to Main Menu', { fontSize: '28px', fill: '#fff', backgroundColor: '#dc3545', padding: { left: 20, right: 20, top: 10, bottom: 10 } })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    backToMenuButton.on('pointerdown', () => {
+      scene.scene.start('MainMenu');
+    });
+
+    this.add([bg, gameOverText, tryAgainButton, createMatchButton, joinMatchButton, backToMenuButton]);
 
     // Keyboard event for ESC to toggle menu
     scene.input.keyboard.on('keydown-ESC', () => {
       this.setVisible(!this.visible);
     });
-  }
-
-  async createNewMatch(scene) {
-    if (scene.nakamaService && scene.nakamaService.socket) {
-      try {
-        const matchName = "NoImpostersAllowed";
-        const match = await scene.nakamaService.socket.createMatch(matchName);
-        console.log("Match created:", match);
-      } catch (error) {
-        console.error("Failed to create match:", error);
-      }
-    }
-  }
-
-  async joinMatch(scene) {
-    const matchId = prompt('Enter Match ID to join:');
-    console.log('Entered Match ID:', matchId);
-    if (matchId && scene.nakamaService && scene.nakamaService.socket) {
-      try {
-        const match = await scene.nakamaService.socket.joinMatch(matchId);
-        console.log('Joined match:', match);
-      } catch (error) {
-        console.error('Failed to join match:', error);
-      }
-    }
   }
 }

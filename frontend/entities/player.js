@@ -1,13 +1,14 @@
 import Phaser from "phaser";
+import System from "./system";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, texture, username, isLocal = false) {
+  constructor(scene, x, y, texture) {
     super(scene, x, y, texture);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setBounce(0.5);
     this.setCollideWorldBounds(true);
-    this.nametag = scene.add.text(0, 0, username, {
+    this.nametag = scene.add.text(0, 0, System.session.username, {
       fontSize: '16px',
       fill: '#fff',
       backgroundColor: 'rgba(0,0,0,0.5)',
@@ -15,12 +16,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     });
     this.nametag.setOrigin(0.5, 1);
     this.createAnimations(scene);
-    this.isLocal = isLocal;
-    this.debug = scene.configData.debug && scene.configData.debug.verbose;
-    this.score = 0;
-    if (this.isLocal) {
-      this.cursors = scene.input.keyboard.createCursorKeys();
-    }
+    this.cursors = scene.input.keyboard.createCursorKeys();
+
   }
 
   createAnimations(scene) {
@@ -35,7 +32,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('turn')) {
       scene.anims.create({
         key: 'turn',
-        frames: [ { key: 'dude', frame: 4 } ],
+        frames: [{ key: 'dude', frame: 4 }],
         frameRate: 20
       });
     }
@@ -54,7 +51,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // Always update nametag position for all players
     this.updateNametag();
     // Only local player handles input
-    if (this.isLocal && this.cursors) {
+    if (this.cursors) {
       if (this.cursors.left.isDown) {
         this.setVelocityX(-160);
         this.anims.play('left', true);
@@ -68,7 +65,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       if (this.cursors.up.isDown && this.body.touching.down) {
         this.setVelocityY(-330);
       }
-      if (this.debug) console.log(this.body.touching.down);
     }
   }
 

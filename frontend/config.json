@@ -1,7 +1,7 @@
 {
     "debug": {
         "showColiders": true,
-        "verbose": false,
+        "verbose": true,
         "username": "pequenourso",
         "email": "pequenourso@gmail.com",
         "password": "Pequenourso123"

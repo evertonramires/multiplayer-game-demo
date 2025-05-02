@@ -39,6 +39,9 @@ Then, in your browser, navigate to [http://localhost:5173](http://localhost:5173
 - [YouTube: Phaser Apple Catcher Starter](https://youtu.be/0qtg-9M3peI?si=SBqQC-xTRPX_0CdP)
 - [GitHub: Phaser Apple Catcher Starter](https://github.com/digitaldeja0/Phaser-Apple-Catcher-Starter)
 
+https://github.com/finepointcgi/Nakama-Integration-Tutorial 
+https://www.youtube.com/watch?v=gU6gIIMYmDM
+
 ---
 
 - **7349:** Nakama gRPC port (not typically used by web clients)
