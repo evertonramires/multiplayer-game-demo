@@ -10,3 +10,9 @@ const game = new Phaser.Game({
   ...System.engineConfig,
   scene: [MainMenu, MainScene]
 });
+
+if (await System.autoJoinFirstFoundMatch()) {
+  // Start the MainScene after joining the match
+  game.scene.start('MainScene');
+  System.listMatchPlayers();
+}

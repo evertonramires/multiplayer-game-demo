@@ -11,6 +11,7 @@ class System {
   static socket = null;
   static session = null;
   static config = config;
+  static playersList = [];
 
   static engineConfig = {
     type: Phaser.WEBGL,
@@ -20,7 +21,7 @@ class System {
     physics: {
       default: "arcade",
       arcade: {
-        gravity: { y: 0},
+        gravity: { y: 0 },
         debug: System.config.showColiders,
       },
     }
@@ -36,27 +37,82 @@ class System {
     }
   }
 
-  static async joinMatch() {
-    const matchId = prompt('Enter Match ID to join:');
-    console.log('Entered Match ID:', matchId);
-if (matchId) {
-    console.log("there is a matchId: " + matchId);
-    try {
-      System.match = await this.socket.joinMatch(matchId);
-      console.log('Joined match:', System.match);
-      return true;
-    } catch (error) {
-      console.error('Failed to join match:', error);
-      window.alert('Failed to join match. Please check the Match ID and try again.');
+  static async joinMatch(matchToJoinId = null) {
+    let matchId = null;
+    if (!matchToJoinId) {
+      matchId = prompt('Enter Match ID to join:');
+      console.log('Entered Match ID:', matchId);
+    }
+    else {
+      matchId = matchToJoinId;
+    }
+    if (matchId) {
+      console.log("there is a matchId: " + matchId);
+      try {
+        System.match = await this.socket.joinMatch(matchId);
+        console.log('Joined match:', System.match);
+        this.playersList = await this.listMatchPlayers();
+        return true;
+      } catch (error) {
+        console.error('Failed to join match:', error);
+        window.alert('Failed to join match. Please check the Match ID and try again.');
+        return false;
+      }
+    }
+    else {
+      console.log("No matchId provided.");
+      // window.alert('No Match ID provided. Please enter a valid Match ID.');
+      return false;
+    }
+
+  }
+
+  static async autoJoinFirstFoundMatch() {
+    let firstFoundMatch = await System.listMatches();
+    if (firstFoundMatch && firstFoundMatch.match_id) {
+      console.log("Joining match: ", firstFoundMatch.match_id);
+      const joined = await System.joinMatch(firstFoundMatch.match_id);
+      if (joined) {
+        console.log("OK! --- Auto joined match: ", firstFoundMatch.match_id);
+        return true;
+      }
+    }
+    else {
+      console.log("Failed to find a match to join.");
       return false;
     }
   }
-  else {
-    console.log("No matchId provided.");
-    // window.alert('No Match ID provided. Please enter a valid Match ID.');
-    return false;
+
+
+  static async listMatches() {
+
+    const result = await this.client.listMatches(this.session);
+
+    if (!result.matches || result.matches.length === 0) {
+      console.log("No matches found.");
+      return null;
+    }
+
+    console.log("Found matches: ");
+    result.matches.forEach(function (resultMatch) {
+      console.log(resultMatch);
+    });
+
+    // Return the first match in the list
+    return result.matches[0];
   }
-}
+
+  static async listMatchPlayers() {
+    let playersList = [];
+    if (System.match && System.match.presences.length > 0) {
+      console.log("Players in Match: ");
+      System.match.presences.forEach(presence => {
+        playersList.push(presence.username);
+      });
+      console.log(playersList);
+    }
+    return playersList;
+  }
 
   static async init() {
     this.client = new nakamajs.Client(

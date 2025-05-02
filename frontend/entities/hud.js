@@ -12,8 +12,15 @@ export default class Hud extends Phaser.GameObjects.Container {
       50,
       50,
       'No data',
-      { fontSize: '15px', fill: '#ff0000', fontStyle: 'bold'}
+      { fontSize: '15px', fill: '#ff0000', fontStyle: 'bold' }
     )
     this.add(this.debugOverlay);
   }
+
+  update() {
+    if (!this.active) return;
+    // Update the debug overlay with the current player data
+    this.debugOverlay.setText(`Player: ${System.session.username}\nMatch ID: ${System.session.matchId}`);
+  }
+
 }

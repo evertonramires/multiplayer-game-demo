@@ -120,10 +120,10 @@ export default class MainScene extends Phaser.Scene {
       if (this.hud && this.hud.debugOverlay) {
         this.hud.debugOverlay.setText(
           'Match ID: ' + System.match.match_id + '\n' +
-          'Players Count:' + System.match.size + '\n' +
-          (System.match.size > 1
-            ? System.match.presences.map(p => p.username).join(', ') + '\n'
-            : '')
+          '---------------------- \n' +
+          'Online Players: ' + System.match.size + '\n' +
+          '---------------------- \n' +
+          System.playersList.map(element => element).join('\n')
         );
       }
     }
