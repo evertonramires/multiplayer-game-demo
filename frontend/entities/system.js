@@ -119,19 +119,29 @@ class System {
 
 
   static async syncMatchStatus(state) {
-    console.log("Sending match state:");
-    console.log(state)
-    System.socket.sendMatchState(System.match.match_id, 1, JSON.stringify(state));
-    // console.log(System.socket)
+    // console.log("Sending match state:");
+    // console.log(state)
+    System.socket.sendMatchState(System.match.match_id, 1, "banana");
 
-    System.socket.onmatchdata = (matchState) => {
+    System.socket.onmatchdata = async (result) => {
       console.log("Received match state: \n");
+      console.log(result); // Vai mostrar o Uint8Array
+      const remoteData = result.data ? result.data : null;
+      const remoteId = result.presence.user_id ? result.presence.user_id : null;
+      const remoteName = result.presence.username ? result.presence.username : null;
+      console.log("Received from: ", remoteId, remoteName);
 
-      // Get the updated position data
-      if (matchState) {
-        console.log(matchState);
-        // var stateJson = receivedState;
-        // var positionState = JSON.parse(stateJson);
+      if (remoteData) {
+
+        // Decodifica o Uint8Array para string JSON
+        const decoder = new TextDecoder("utf-8");
+        const jsonString = decoder.decode(remoteData);
+
+        // Faz o parse do JSON
+        const receivedData = JSON.parse(jsonString);
+
+        console.log("Parsed match state: \n");
+        console.log(receivedData);
       }
     };
 
