@@ -123,6 +123,17 @@ class System {
     // console.log(state)
     System.socket.sendMatchState(System.match.match_id, 0, JSON.stringify(state));
     // console.log(System.socket)
+
+    System.socket.onmatchdata = (matchState) => {
+      console.log("Received match state: \n");
+
+      // Get the updated position data
+      var stateJson = matchState.state;
+      var positionState = JSON.parse(stateJson);
+      console.log(positionState);
+    };
+
+
   }
 
   static async init() {
@@ -154,7 +165,7 @@ class System {
     this.socket = this.client.createSocket();
     await this.socket.connect(this.session, true);
   }
-  
+
 }
 
 export default System;
