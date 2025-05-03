@@ -9,8 +9,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setBounce(0);
     this.setCollideWorldBounds(true);
 
-    this.body.setSize(30, 40);         // reduz a hitbox para 20px de altura
-    this.body.setOffset(0, 10);        // 48 - 20 = 28 → desloca a hitbox para o fundo
+    // this.body.setSize(30, 40);         // reduz a hitbox para 20px de altura
+    // this.body.setOffset(0, 10);        // 48 - 20 = 28 → desloca a hitbox para o fundo
 
     this.nametag = scene.add.text(0, 0, System.session.username, {
       fontSize: '16px',
@@ -38,7 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('left')) {
       scene.anims.create({
         key: 'left',
-        frames: scene.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+        frames: scene.anims.generateFrameNumbers('dude', { start: 3, end: 2 }),
         frameRate: 10,
         repeat: -1
       });
@@ -53,7 +53,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('right')) {
       scene.anims.create({
         key: 'right',
-        frames: scene.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+        frames: scene.anims.generateFrameNumbers('dude', { start: 5, end: 6 }),
         frameRate: 10,
         repeat: -1
       });
