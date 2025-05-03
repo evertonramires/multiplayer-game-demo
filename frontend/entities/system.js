@@ -33,9 +33,9 @@ class System {
     try {
       const matchName = "NoImpostersAllowed";
       System.match = await System.socket.createMatch(matchName);
-      console.log("Match created:", System.match);
+      // //console.log("Match created:", System.match);
     } catch (error) {
-      console.error("Failed to create match:", error);
+      // //console.error("Failed to create match:", error);
     }
   }
 
@@ -43,26 +43,26 @@ class System {
     let matchId = null;
     if (!matchToJoinId) {
       matchId = prompt('Enter Match ID to join:');
-      console.log('Entered Match ID:', matchId);
+      // //console.log('Entered Match ID:', matchId);
     }
     else {
       matchId = matchToJoinId;
     }
     if (matchId) {
-      console.log("there is a matchId: " + matchId);
+      //console.log("there is a matchId: " + matchId);
       try {
         System.match = await this.socket.joinMatch(matchId);
-        console.log('Joined match:', System.match);
+        //console.log('Joined match:', System.match);
         this.playersList = await this.listMatchPlayers();
         return true;
       } catch (error) {
-        console.error('Failed to join match:', error);
+        //console.error('Failed to join match:', error);
         window.alert('Failed to join match. Please check the Match ID and try again.');
         return false;
       }
     }
     else {
-      console.log("No matchId provided.");
+      //console.log("No matchId provided.");
       // window.alert('No Match ID provided. Please enter a valid Match ID.');
       return false;
     }
@@ -72,15 +72,15 @@ class System {
   static async autoJoinFirstFoundMatch() {
     let firstFoundMatch = await System.listMatches();
     if (firstFoundMatch && firstFoundMatch.match_id) {
-      console.log("Joining match: ", firstFoundMatch.match_id);
+      //console.log("Joining match: ", firstFoundMatch.match_id);
       const joined = await System.joinMatch(firstFoundMatch.match_id);
       if (joined) {
-        console.log("OK! --- Auto joined match: ", firstFoundMatch.match_id);
+        //console.log("OK! --- Auto joined match: ", firstFoundMatch.match_id);
         return true;
       }
     }
     else {
-      console.log("Failed to find a match to join.");
+      //console.log("Failed to find a match to join.");
       return false;
     }
   }
@@ -90,13 +90,13 @@ class System {
     const result = await this.client.listMatches(this.session);
 
     if (!result.matches || result.matches.length === 0) {
-      console.log("No matches found.");
+      //console.log("No matches found.");
       return null;
     }
 
-    console.log("Found matches: ");
+    //console.log("Found matches: ");
     result.matches.forEach(function (resultMatch) {
-      console.log(resultMatch);
+      //console.log(resultMatch);
     });
 
     // Return the first match in the list
@@ -106,28 +106,28 @@ class System {
   static async listMatchPlayers() {
     let playersList = [];
     if (System.match && System.match.presences.length > 0) {
-      console.log("Players in Match: ");
+      //console.log("Players in Match: ");
       System.match.presences.forEach(presence => {
         playersList.push(presence.username);
       });
-      console.log(playersList);
+      //console.log(playersList);
     }
     return playersList;
   }
 
   static async syncMatchStatus(stateToSend) {
-    // console.log("Sending match state:");
-    // console.log(state)
+    // //console.log("Sending match state:");
+    // //console.log(state)
     const stateToSendString = JSON.stringify(stateToSend);
     System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
 
     System.socket.onmatchdata = async (result) => {
-      // console.log("Received match state: \n");
-      // console.log(result); // Vai mostrar o Uint8Array
+      // //console.log("Received match state: \n");
+      // //console.log(result); // Vai mostrar o Uint8Array
       const remoteData = result.data ? result.data : null;
       const remoteId = result.presence.user_id ? result.presence.user_id : null;
       const remoteName = result.presence.username ? result.presence.username : null;
-      // console.log("Received from: ", remoteId, remoteName);
+      // //console.log("Received from: ", remoteId, remoteName);
 
       if (remoteData) {
 
@@ -138,8 +138,8 @@ class System {
         // Faz o parse do JSON
         const receivedData = JSON.parse(jsonString);
 
-        // console.log("Parsed match state: \n");
-        // console.log(receivedData);
+        // //console.log("Parsed match state: \n");
+        // //console.log(receivedData);
         const playerIndex = System.playersState.findIndex(
           (ply) => ply.playerId === receivedData.playerId
         );
@@ -151,20 +151,20 @@ class System {
           // Add new player entry
           System.playersState.push(receivedData);
         }
-        // console.log("Updated players state: \n");
-        // console.log(System.playersState);
+        // //console.log("Updated players state: \n");
+        // //console.log(System.playersState);
       }
     };
 
     System.readAllObjects();
-    // console.log(System.allObjectsState)
+    // //console.log(System.allObjectsState)
 
   }
 
 
   static async writeObject(object_id = "someone_forgot_object_id", x = 0, y = 0) {
 
-    console.log("Writing object: ", object_id, x, y);
+    //console.log("Writing object: ", object_id, x, y);
 
     let payload = [
       {
@@ -178,7 +178,7 @@ class System {
     ]
 
     let recebido = await this.client.rpc(this.session, "manageobjects", payload);
-    console.log(recebido);
+    //console.log(recebido);
   }
 
   static async readAllObjects() {
@@ -195,12 +195,12 @@ class System {
     ]
 
     let response  = await this.client.rpc(this.session, "manageobjects", payload);
-    // console.log(response);
+    // //console.log(response);
     // let parsedResponse = JSON.parse(response);
-    // console.log(parsedResponse);
+    // //console.log(parsedResponse);
 
     System.allObjectsState =  response.payload.objects;
-    // console.log(System.allObjectsState);
+    // //console.log(System.allObjectsState);
   }
 
   static async init() {
@@ -218,20 +218,20 @@ class System {
       // Authenticate with email and password
       this.session = await this.client.authenticateEmail(email, password);
       if (this.config.debug.verbose) {
-        console.log("Authenticated successfully:", this.session);
-        console.log("userId: ", this.session.user_id);
-        console.log("username: ", this.session.username);
-        console.log("email: ", email);
-        console.log("password: ", password);
+        //console.log("Authenticated successfully:", this.session);
+        //console.log("userId: ", this.session.user_id);
+        //console.log("username: ", this.session.username);
+        //console.log("email: ", email);
+        //console.log("password: ", password);
       }
     } catch (error) {
-      if (this.config.debug.verbose) console.error("Authentication failed:", error);
+      if (this.config.debug.verbose) //console.error("Authentication failed:", error);
       throw error;
     }
 
     this.socket = this.client.createSocket();
     await this.socket.connect(this.session, true);
-    console.log("Socket connected:", this.socket);
+    //console.log("Socket connected:", this.socket);
   }
 
   static async createUser() {
@@ -240,14 +240,14 @@ class System {
       // Authenticate with email and password
       this.session = await this.client.authenticateEmail(email, password, 1, username);
       if (this.config.debug.verbose) {
-        console.log("Authenticated successfully:", this.session);
-        console.log("userId: ", this.session.user_id);
-        console.log("username: ", this.session.username);
-        console.log("email: ", email);
-        console.log("password: ", password);
+        //console.log("Authenticated successfully:", this.session);
+        //console.log("userId: ", this.session.user_id);
+        //console.log("username: ", this.session.username);
+        //console.log("email: ", email);
+        //console.log("password: ", password);
       }
     } catch (error) {
-      if (this.config.debug.verbose) console.error("Authentication failed:", error);
+      if (this.config.debug.verbose) //console.error("Authentication failed:", error);
       throw error;
     }
 
