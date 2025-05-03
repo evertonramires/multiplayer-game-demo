@@ -31,7 +31,7 @@ class System {
   static async createNewMatch() {
     try {
       const matchName = "NoImpostersAllowed";
-      System.match = await this.socket.createMatch(matchName);
+      System.match = await System.socket.createMatch(matchName);
       console.log("Match created:", System.match);
     } catch (error) {
       console.error("Failed to create match:", error);
@@ -84,7 +84,6 @@ class System {
     }
   }
 
-
   static async listMatches() {
 
     const result = await this.client.listMatches(this.session);
@@ -114,10 +113,6 @@ class System {
     }
     return playersList;
   }
-
-
-
-
 
   static async syncMatchStatus(stateToSend) {
     // console.log("Sending match state:");
@@ -189,10 +184,29 @@ class System {
       throw error;
     }
 
-    this.socket = this.client.createSocket();
+    this.socket = this.client.createSocket(false, true);
     await this.socket.connect(this.session, true);
+    console.log("Socket connected:", this.socket);
   }
 
+  static async createUser() {
+        try {
+      const { email, password, username } = serverConfig;
+      // Authenticate with email and password
+      this.session = await this.client.authenticateEmail(email, password, 1, username);
+      if (this.config.debug.verbose) {
+        console.log("Authenticated successfully:", this.session);
+        console.log("userId: ", this.session.user_id);
+        console.log("username: ", this.session.username);
+        console.log("email: ", email);
+        console.log("password: ", password);
+      }
+    } catch (error) {
+      if (this.config.debug.verbose) console.error("Authentication failed:", error);
+      throw error;
+    }
+
+}
 }
 
 export default System;

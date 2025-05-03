@@ -36,5 +36,18 @@ export default class MainMenu extends Phaser.Scene {
             let hasMatch = await System.joinMatch();
             if (hasMatch) this.scene.start('MainScene', { action: 'join' });
         });
+
+        // Register button
+        const registerBtn = this.add.text(width / 2, height / 2 + 140, 'Register', {
+            fontSize: '32px', fill: '#fff', backgroundColor: '#ffc107', padding: { left: 30, right: 30, top: 10, bottom: 10 }
+        })
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true });
+        registerBtn.on('pointerdown', async () => {
+            await System.createUser();
+            this.add.text(width / 2, height / 2 + 200, 'User registered!', {
+            fontSize: '24px', fill: '#fff', backgroundColor: '#28a745', padding: { left: 20, right: 20, top: 5, bottom: 5 }
+            }).setOrigin(0.5);
+        });
     }
 }

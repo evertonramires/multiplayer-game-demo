@@ -16,12 +16,3 @@ if (await System.autoJoinFirstFoundMatch()) {
   game.scene.start('MainScene');
   System.listMatchPlayers();
 }
-
-
-       System.socket.onMatchData = (matchState) => {
-          var stateJson = matchState.state;
-          var positionState = JSON.parse(stateJson);
-
-          console.log("Received match state: \n");
-          console.log(positionState);
-      }
