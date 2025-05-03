@@ -13,6 +13,7 @@ class System {
   static config = config;
   static playersList = [];
   static playersState = [];
+  static allObjectsState = [];
 
   static engineConfig = {
     type: Phaser.WEBGL,
@@ -155,7 +156,50 @@ class System {
       }
     };
 
+    System.readAllObjects();
 
+  }
+
+
+  static async writeObject(object_id = "someone_forgot_object_id", x = 0, y = 0) {
+
+    console.log("Writing object: ", object_id, x, y);
+
+    let payload = [
+      {
+        key: object_id,
+        collection: "scene_objects",
+        userId: "00000000-0000-0000-0000-000000000000",
+        value: { "x": x, "y": y },
+        permissionRead: 2,
+        permissionWrite: 1,
+      }
+    ]
+
+    let recebido = await this.client.rpc(this.session, "manageobjects", payload);
+    console.log(recebido);
+  }
+
+  static async readAllObjects() {
+
+    let payload = [
+      {
+        key: "empty",
+        collection: "scene_objects",
+        userId: "00000000-0000-0000-0000-000000000000",
+        value: { "x": 0, "y": 0 },
+        permissionRead: 2,
+        permissionWrite: 1,
+      }
+    ]
+
+    let response  = await this.client.rpc(this.session, "manageobjects", payload);
+    // console.log(response);
+    // let parsedResponse = JSON.parse(response);
+    // console.log(parsedResponse);
+
+    System.allObjectsState =  response.payload.objects;
+    // console.log(System.allObjectsState);
   }
 
   static async init() {
@@ -190,7 +234,7 @@ class System {
   }
 
   static async createUser() {
-        try {
+    try {
       const { email, password, username } = serverConfig;
       // Authenticate with email and password
       this.session = await this.client.authenticateEmail(email, password, 1, username);
@@ -206,7 +250,7 @@ class System {
       throw error;
     }
 
-}
+  }
 }
 
 export default System;

@@ -12,6 +12,8 @@ const game = new Phaser.Game({
   scene: [MainMenu, MainScene, TestScene]
 });
 
+// System.writeObject("um_testinho",10,5)
+
 // if (await System.autoJoinFirstFoundMatch()) {
 //   // Start the MainScene after joining the match
 //   game.scene.start('MainScene');

@@ -8,6 +8,7 @@ import Menu from "../entities/menu";
 import Hud from "../entities/hud";
 import System from "../entities/system";
 import Patients from "../entities/patients";
+import PlaceHolder from "../entities/placeHolder";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -64,16 +65,16 @@ export default class MainScene extends Phaser.Scene {
 
     // PAREDE ESQUERDA
     const leftWall = this.physics.add.staticImage(wallThickness / 2, height / 2, 'wall')
-    .setDisplaySize(wallThickness, height)
-    .setOrigin(0.5)
-    .refreshBody();
+      .setDisplaySize(wallThickness, height)
+      .setOrigin(0.5)
+      .refreshBody();
     this.walls.add(leftWall);
 
     // PAREDE DIREITA
     const rightWall = this.physics.add.staticImage(width - marginRight - wallThickness / 2, height / 2, 'wall')
-    .setDisplaySize(wallThickness, height)
-    .setOrigin(0.5)
-    .refreshBody();
+      .setDisplaySize(wallThickness, height)
+      .setOrigin(0.5)
+      .refreshBody();
     this.walls.add(rightWall);
 
     // Patients
@@ -93,6 +94,7 @@ export default class MainScene extends Phaser.Scene {
         obj.setScale(0.5);
       }
     }
+
 
     this.localPlayer = new Player(this, 100, 500, 'dude');
 
@@ -132,6 +134,9 @@ export default class MainScene extends Phaser.Scene {
       }
     }
 
+    // Spawn a placeholder object at a fixed position
+    this.placeHolder = new PlaceHolder(this, 400, 300, 'placeholder_001');
+
     // HUD overlay
     this.hud = new Hud(this);
     // this.hud.setDepth(1000); // Ensure HUD is above all other game objects
@@ -147,6 +152,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     // Ensure things collide
+    this.physics.add.collider(this.walls, this.placeHolder);
+    this.physics.add.collider(this.localPlayer, this.placeHolder);
     this.physics.add.collider(this.localPlayer, this.patients);
     this.physics.add.collider(this.localPlayer, this.walls);
 
@@ -174,7 +181,7 @@ export default class MainScene extends Phaser.Scene {
       if (remotePlayerState.playerId === System.session.user_id) return;
 
       // Assign a remotePlayer sprite for each remote player state
-       let remo = this.remotePlayersBody[idx];
+      let remo = this.remotePlayersBody[idx];
       if (remo) {
         remo.x = remotePlayerState.playerX;
         remo.y = remotePlayerState.playerY;
