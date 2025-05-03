@@ -11,6 +11,7 @@ export default class Patients extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(0.2);
         this.body.moves = false;
         this.setDrag(100);
+        this.body.setSize(32, 70);   // Redimensiona a hitbox
         
         // Estado do objeto
         this.isBeingHeld = false;

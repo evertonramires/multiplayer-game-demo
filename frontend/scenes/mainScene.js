@@ -20,6 +20,8 @@ export default class MainScene extends Phaser.Scene {
     this.gameOver = false;
     this.remotePlayersBody = [];
     this.remotePlayers = [];
+    this.lastNetworkUpdate = 0;
+    this.networkUpdateInterval = 100; // ms (envia atualizações a cada 100ms)
   }
 
   preload() {
@@ -227,6 +229,19 @@ export default class MainScene extends Phaser.Scene {
     localState.playerY = this.localPlayer.y;
     System.syncMatchStatus(localState);
 
+    if (time - this.lastNetworkUpdate > this.networkUpdateInterval) {
+      if (this.placeHolder.x !== this.placeHolder.lastX || 
+          this.placeHolder.y !== this.placeHolder.lastY) {
+        System.writeObject(
+          this.placeHolder.object_id, 
+          this.placeHolder.x, 
+          this.placeHolder.y
+        );
+        this.placeHolder.lastX = this.placeHolder.x;
+        this.placeHolder.lastY = this.placeHolder.y;
+      }
+      this.lastNetworkUpdate = time;
+    }
   }
 
   hitBomb(player, bomb) {

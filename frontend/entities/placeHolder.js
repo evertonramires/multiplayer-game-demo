@@ -28,17 +28,22 @@ export default class PlaceHolder extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    try {
-      if (System.allObjectsState) {
-        const obj = System.allObjectsState.find(o => o.key === this.object_id);
-        // console.log(obj);
-        if (obj) {
-          const { x, y } = obj.value;
-          this.setPosition(x, y);
-        }
+    // Busca o estado mais recente do objeto no servidor
+    const remoteObj = System.allObjectsState.find(o => o.key === this.object_id);
+    
+    if (remoteObj) {
+      const { x: serverX, y: serverY } = remoteObj.value;
+  
+      // Verifica se a posição local está muito diferente da posição do servidor
+      const distance = Phaser.Math.Distance.Between(this.x, this.y, serverX, serverY);
+      
+      // Se a diferença for grande (> 10 pixels), interpola suavemente
+      if (distance > 10) {
+        // Fator de suavização (0.1 a 0.3 para movimento gradual)
+        const lerpFactor = 0.2; 
+        this.x = Phaser.Math.Linear(this.x, serverX, lerpFactor);
+        this.y = Phaser.Math.Linear(this.y, serverY, lerpFactor);
       }
-    } catch (e) {
-      console.error("Error updating placeholder position: ", e);
     }
   }
 

@@ -24,7 +24,7 @@ class System {
       default: "arcade",
       arcade: {
         gravity: { y: 0 },
-        debug: System.config.showColiders,
+        debug: true,
       },
     }
   };

@@ -8,6 +8,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setBounce(0);
     this.setCollideWorldBounds(true);
+
+    this.body.setSize(30, 40);         // reduz a hitbox para 20px de altura
+    this.body.setOffset(0, 10);        // 48 - 20 = 28 → desloca a hitbox para o fundo
+
     this.nametag = scene.add.text(0, 0, System.session.username, {
       fontSize: '16px',
       fill: '#fff',
