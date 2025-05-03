@@ -17,6 +17,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.nametag.setOrigin(0.5, 1);
     this.createAnimations(scene);
     this.cursors = scene.input.keyboard.createCursorKeys();
+    this.keys = scene.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D
+    });    
 
     this.patients = scene.patients; // Grupo de objetos seguráveis
     this.heldObject = null; // Objeto atualmente segurado
@@ -77,15 +83,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       let velocityX = 0;
       let velocityY = 0;
 
-      if (this.cursors.left.isDown) {
+      if (this.cursors.left.isDown || this.keys.left.isDown) {
         velocityX = -160;
-      } else if (this.cursors.right.isDown) {
+      } else if (this.cursors.right.isDown || this.keys.right.isDown) {
         velocityX = 160;
       }
 
-      if (this.cursors.up.isDown) {
+      if (this.cursors.up.isDown || this.keys.up.isDown) {
         velocityY = -160;
-      } else if (this.cursors.down.isDown) {
+      } else if (this.cursors.down.isDown || this.keys.down.isDown) {
         velocityY = 160;
       }
 
