@@ -1,5 +1,5 @@
 FROM node:alpine AS node-builder
-
+RUN apk update && apk add git
 WORKDIR /backend
 
 COPY package*.json .
