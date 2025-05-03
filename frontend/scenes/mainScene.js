@@ -32,6 +32,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('paciente', 'assets/pacienteGrave.png');
     this.load.spritesheet('dude', 'assets/doctor_sides.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('dude2', 'assets/doctor_updown.png', { frameWidth: 32, frameHeight: 48 });
   }
 
   create() {

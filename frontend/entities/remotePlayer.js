@@ -24,7 +24,7 @@ export default class RemotePlayer extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('left')) {
       scene.anims.create({
         key: 'left',
-        frames: scene.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+        frames: scene.anims.generateFrameNumbers('dude', { start: 3, end: 1 }),
         frameRate: 10,
         repeat: -1
       });
@@ -39,7 +39,23 @@ export default class RemotePlayer extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('right')) {
       scene.anims.create({
         key: 'right',
-        frames: scene.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+        frames: scene.anims.generateFrameNumbers('dude', { start: 5, end: 7 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    if (!scene.anims.exists('up')) {
+      scene.anims.create({
+        key: 'up',
+        frames: scene.anims.generateFrameNumbers('dude2', { start: 1, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+    if (!scene.anims.exists('down')) {
+      scene.anims.create({
+        key: 'down',
+        frames: scene.anims.generateFrameNumbers('dude2', { start: 5, end: 7 }),
         frameRate: 10,
         repeat: -1
       });
