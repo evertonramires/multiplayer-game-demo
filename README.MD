@@ -5,7 +5,8 @@
 Navigate to `/backend` and run:
 
 ```sh
-docker compose up
+npm install
+docker compose up --build
 ```
 
 For accessing admin dashboard, navigate to [http://SERVERADDRESS:7351](http://localhost:7351)
@@ -41,6 +42,7 @@ Then, in your browser, navigate to [http://localhost:5173](http://localhost:5173
 
 https://github.com/finepointcgi/Nakama-Integration-Tutorial 
 https://www.youtube.com/watch?v=gU6gIIMYmDM
+https://www.youtube.com/watch?v=FXguREV6Zf8
 
 ---
 
