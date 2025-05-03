@@ -26,6 +26,7 @@ export default class MainScene extends Phaser.Scene {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('hospital', 'assets/hospital.png');
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('wall', 'assets/wall.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('paciente', 'assets/pacienteGrave.png');
@@ -44,6 +45,42 @@ export default class MainScene extends Phaser.Scene {
     this.platforms.create(600, 400, 'ground');
     this.platforms.create(50, 250, 'ground');
     this.platforms.create(750, 220, 'ground');
+
+    // Tamanho da tela (ajuste conforme sua config)
+    const width = this.scale.width;
+    const height = this.scale.height;
+    const wallThickness = 32; // largura constante da parede
+
+    // GRUPO DE PAREDES
+    this.walls = this.physics.add.staticGroup();
+
+    // PAREDE SUPERIOR
+    const topWall = this.physics.add.staticImage(width / 2, wallThickness / 2, 'wall')
+    .setDisplaySize(width, wallThickness)
+    .setOrigin(0.5)
+    .refreshBody();
+    this.walls.add(topWall);
+
+    // PAREDE INFERIOR
+    const bottomWall = this.physics.add.staticImage(width / 2, height - wallThickness / 2, 'wall')
+    .setDisplaySize(width, wallThickness)
+    .setOrigin(0.5)
+    .refreshBody();
+    this.walls.add(bottomWall);
+
+    // PAREDE ESQUERDA
+    const leftWall = this.physics.add.staticImage(wallThickness / 2, height / 2, 'wall')
+    .setDisplaySize(wallThickness, height)
+    .setOrigin(0.5)
+    .refreshBody();
+    this.walls.add(leftWall);
+
+    // PAREDE DIREITA
+    const rightWall = this.physics.add.staticImage(width - wallThickness / 2, height / 2, 'wall')
+    .setDisplaySize(wallThickness, height)
+    .setOrigin(0.5)
+    .refreshBody();
+    this.walls.add(rightWall);
 
     // Create a ground platform at the bottom of the canvas
     const ground = this.platforms.create(System.config.canvas.width / 2, System.config.canvas.height - 30, 'ground').setScale(5).refreshBody();
@@ -126,6 +163,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.bombs, this.platforms);
     this.physics.add.collider(this.patients, this.platforms);
     this.physics.add.collider(this.localPlayer, this.patients);
+    this.physics.add.collider(this.localPlayer, this.walls);
 
 
     // Calls Menu when player dies
