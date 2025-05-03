@@ -172,7 +172,7 @@ export default class MainScene extends Phaser.Scene {
     this.menuScreen.setVisible(false);
   }
 
-  async update() {
+  update(time) {
     if (this.gameOver) return;
     if (this.localPlayer) this.localPlayer.update();
     if (this.placeHolder) this.placeHolder.update();
