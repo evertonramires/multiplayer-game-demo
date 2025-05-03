@@ -51,12 +51,12 @@ export default class MainMenu extends Phaser.Scene {
         });
 
         // Test button
-        const testBtn = this.add.text(width / 2, height / 2 + 160, 'Test', {
+        const testBtn = this.add.text(width / 2, height / 2 + 210, 'Test', {
            fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 30, right: 30, top: 10, bottom: 10 }
         })
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });
-        createBtn.on('pointerdown', async () => {
+        testBtn.on('pointerdown', async () => {
             // Call the createNewMatch function from System
             await System.createNewMatch();
             this.scene.start('TestScene', { action: 'create' });
