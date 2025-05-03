@@ -28,8 +28,13 @@ export default class PlaceHolder extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    this.x = System.allObjectsState[this.object_id].x;
-    this.y = System.allObjectsState[this.object_id].y;
+    try {
+      if (System.allObjectsState && System.allObjectsState[this.object_id]) {
+      this.y = System.allObjectsState[this.object_id].y;
+      }
+    } catch (e) {
+      // Optionally log or handle error
+    }
   }
 
   collectStar(player, scene) {

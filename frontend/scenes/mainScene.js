@@ -173,6 +173,7 @@ export default class MainScene extends Phaser.Scene {
   async update() {
     if (this.gameOver) return;
     if (this.localPlayer) this.localPlayer.update();
+    if (this.placeHolder) this.placeHolder.update();
 
 
     // Update remote players based on System.playersState
