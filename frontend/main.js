@@ -12,8 +12,8 @@ const game = new Phaser.Game({
   scene: [MainMenu, MainScene, TestScene]
 });
 
-if (await System.autoJoinFirstFoundMatch()) {
-  // Start the MainScene after joining the match
-  game.scene.start('MainScene');
-  System.listMatchPlayers();
-}
+// if (await System.autoJoinFirstFoundMatch()) {
+//   // Start the MainScene after joining the match
+//   game.scene.start('MainScene');
+//   System.listMatchPlayers();
+// }
