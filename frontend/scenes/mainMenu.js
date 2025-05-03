@@ -49,5 +49,17 @@ export default class MainMenu extends Phaser.Scene {
             fontSize: '24px', fill: '#fff', backgroundColor: '#28a745', padding: { left: 20, right: 20, top: 5, bottom: 5 }
             }).setOrigin(0.5);
         });
+
+        // Test button
+        const testBtn = this.add.text(width / 2, height / 2 + 160, 'Test', {
+           fontSize: '32px', fill: '#fff', backgroundColor: '#007bff', padding: { left: 30, right: 30, top: 10, bottom: 10 }
+        })
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true });
+        createBtn.on('pointerdown', async () => {
+            // Call the createNewMatch function from System
+            await System.createNewMatch();
+            this.scene.start('TestScene', { action: 'create' });
+        });
     }
 }

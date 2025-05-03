@@ -49,17 +49,17 @@ export default class MainScene extends Phaser.Scene {
     this.walls = this.physics.add.staticGroup();
 
     // PAREDE SUPERIOR
-    const topWall = this.physics.add.staticImage((width - marginRight) / 2, wallThickness / 2, 'wall')
-    .setDisplaySize(width, wallThickness)
-    .setOrigin(0.5)
-    .refreshBody();
+    const topWall = this.physics.add.staticImage(0, wallThickness / 2, 'wall')
+      .setOrigin(0, 0.5)
+      .setDisplaySize(width - marginRight, wallThickness)
+      .refreshBody();
     this.walls.add(topWall);
 
     // PAREDE INFERIOR
-    const bottomWall = this.physics.add.staticImage((width - marginRight) / 2, height - wallThickness / 2, 'wall')
-    .setDisplaySize(width, wallThickness)
-    .setOrigin(0.5)
-    .refreshBody();
+    const bottomWall = this.physics.add.staticImage(0, height - wallThickness / 2, 'wall')
+      .setOrigin(0, 0.5)
+      .setDisplaySize(width - marginRight, wallThickness)
+      .refreshBody();
     this.walls.add(bottomWall);
 
     // PAREDE ESQUERDA
