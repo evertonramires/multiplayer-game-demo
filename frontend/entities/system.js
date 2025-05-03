@@ -184,7 +184,7 @@ class System {
       throw error;
     }
 
-    this.socket = this.client.createSocket(false, true);
+    this.socket = this.client.createSocket();
     await this.socket.connect(this.session, true);
     console.log("Socket connected:", this.socket);
   }
