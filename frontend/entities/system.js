@@ -145,7 +145,7 @@ class System {
         // console.log("Parsed match state: \n");
         // console.log(receivedData);
         const playerIndex = System.playersState.findIndex(
-          (ply) => ply.player_id === receivedData.player_id
+          (ply) => ply.playerId === receivedData.playerId
         );
 
         if (playerIndex !== -1) {
