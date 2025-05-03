@@ -29,11 +29,16 @@ export default class PlaceHolder extends Phaser.Physics.Arcade.Sprite {
 
   update() {
     try {
-      if (System.allObjectsState && System.allObjectsState[this.object_id]) {
-      this.y = System.allObjectsState[this.object_id].y;
+      if (System.allObjectsState) {
+        const obj = System.allObjectsState.find(o => o.key === this.object_id);
+        // console.log(obj);
+        if (obj) {
+          const { x, y } = obj.value;
+          this.setPosition(x, y);
+        }
       }
     } catch (e) {
-      // Optionally log or handle error
+      console.error("Error updating placeholder position: ", e);
     }
   }
 

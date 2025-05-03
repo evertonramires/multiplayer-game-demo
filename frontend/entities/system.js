@@ -157,6 +157,7 @@ class System {
     };
 
     System.readAllObjects();
+    // console.log(System.allObjectsState)
 
   }
 
