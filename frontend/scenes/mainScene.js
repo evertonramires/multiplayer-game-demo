@@ -16,7 +16,6 @@ export default class MainScene extends Phaser.Scene {
     this.configData = System.config;
     this.stars = null;
     this.bombs = null;
-    this.platforms = null;
     this.gameOver = false;
     this.remotePlayersBody = [];
     this.remotePlayers = [];
@@ -25,7 +24,6 @@ export default class MainScene extends Phaser.Scene {
   preload() {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('hospital', 'assets/hospital.png');
-    this.load.image('ground', 'assets/platform.png');
     this.load.image('wall', 'assets/wall.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
@@ -40,29 +38,25 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-    this.platforms = this.physics.add.staticGroup();
-    this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-    this.platforms.create(600, 400, 'ground');
-    this.platforms.create(50, 250, 'ground');
-    this.platforms.create(750, 220, 'ground');
 
     // Tamanho da tela (ajuste conforme sua config)
     const width = this.scale.width;
     const height = this.scale.height;
     const wallThickness = 32; // largura constante da parede
+    const marginRight = 100;
 
     // GRUPO DE PAREDES
     this.walls = this.physics.add.staticGroup();
 
     // PAREDE SUPERIOR
-    const topWall = this.physics.add.staticImage(width / 2, wallThickness / 2, 'wall')
+    const topWall = this.physics.add.staticImage((width - marginRight) / 2, wallThickness / 2, 'wall')
     .setDisplaySize(width, wallThickness)
     .setOrigin(0.5)
     .refreshBody();
     this.walls.add(topWall);
 
     // PAREDE INFERIOR
-    const bottomWall = this.physics.add.staticImage(width / 2, height - wallThickness / 2, 'wall')
+    const bottomWall = this.physics.add.staticImage((width - marginRight) / 2, height - wallThickness / 2, 'wall')
     .setDisplaySize(width, wallThickness)
     .setOrigin(0.5)
     .refreshBody();
@@ -76,15 +70,11 @@ export default class MainScene extends Phaser.Scene {
     this.walls.add(leftWall);
 
     // PAREDE DIREITA
-    const rightWall = this.physics.add.staticImage(width - wallThickness / 2, height / 2, 'wall')
+    const rightWall = this.physics.add.staticImage(width - marginRight - wallThickness / 2, height / 2, 'wall')
     .setDisplaySize(wallThickness, height)
     .setOrigin(0.5)
     .refreshBody();
     this.walls.add(rightWall);
-
-    // Create a ground platform at the bottom of the canvas
-    const ground = this.platforms.create(System.config.canvas.width / 2, System.config.canvas.height - 30, 'ground').setScale(5).refreshBody();
-    ground.setTintFill(0x808080); // grey tint
 
     // Patients
     this.patients = this.physics.add.group({
@@ -105,7 +95,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     this.localPlayer = new Player(this, 100, 500, 'dude');
-
 
     //spawn 10 remote player bodies in a hidden place to be assigned to remote players if they join match
     this.remotePlayersBody = [];
@@ -151,20 +140,15 @@ export default class MainScene extends Phaser.Scene {
     // Set Player collider
     if (this.localPlayer) {
       this.localPlayer.setupColliders({
-        platforms: this.platforms,
         stars: this.stars,
         bombs: this.bombs,
         scene: this
       });
     }
 
-    // Ensure stars and bombs collide with platforms
-    this.physics.add.collider(this.stars, this.platforms);
-    this.physics.add.collider(this.bombs, this.platforms);
-    this.physics.add.collider(this.patients, this.platforms);
+    // Ensure things collide
     this.physics.add.collider(this.localPlayer, this.patients);
     this.physics.add.collider(this.localPlayer, this.walls);
-
 
     // Calls Menu when player dies
     this.menuScreen = new Menu(
