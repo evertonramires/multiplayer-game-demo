@@ -112,8 +112,8 @@
         }, 
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5409, 5410, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5415, 5416, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5381, 5382, 0, 0, 5381, 5382, 0, 0, 0, 5357, 5358, 0, 0, 0, 0, 5357, 5358, 0, 0, 5361, 5362, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5387, 5388, 0, 0, 5387, 5388, 0, 0, 0, 5363, 5364, 0, 0, 0, 0, 5363, 5364, 0, 0, 5367, 5368, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -154,7 +154,7 @@
         {
          "columns":8,
          "firstgid":1,
-         "image":"decorative_cracks_walls.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/decorative_cracks_walls.png",
          "imageheight":512,
          "imagewidth":128,
          "margin":0,
@@ -167,7 +167,7 @@
         {
          "columns":8,
          "firstgid":257,
-         "image":"decorative_cracks_floor.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/decorative_cracks_floor.png",
          "imageheight":240,
          "imagewidth":128,
          "margin":0,
@@ -180,7 +180,7 @@
         {
          "columns":17,
          "firstgid":377,
-         "image":"walls_floor.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/walls_floor.png",
          "imageheight":464,
          "imagewidth":272,
          "margin":0,
@@ -2675,7 +2675,7 @@
         {
          "columns":29,
          "firstgid":870,
-         "image":"Water_coasts_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/Water_coasts_animation.png",
          "imageheight":512,
          "imagewidth":464,
          "margin":0,
@@ -4286,7 +4286,7 @@
         {
          "columns":37,
          "firstgid":1798,
-         "image":"water_details_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/water_details_animation.png",
          "imageheight":1248,
          "imagewidth":592,
          "margin":0,
@@ -9680,7 +9680,7 @@
         {
          "columns":19,
          "firstgid":4684,
-         "image":"decorative_cracks_coasts_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/decorative_cracks_coasts_animation.png",
          "imageheight":400,
          "imagewidth":304,
          "margin":0,
@@ -11263,7 +11263,7 @@
         {
          "columns":11,
          "firstgid":5159,
-         "image":"fire_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/fire_animation.png",
          "imageheight":288,
          "imagewidth":176,
          "margin":0,
@@ -12201,7 +12201,7 @@
         {
          "columns":6,
          "firstgid":5357,
-         "image":"fire_animation2.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/fire_animation2.png",
          "imageheight":192,
          "imagewidth":96,
          "margin":0,
@@ -12599,7 +12599,7 @@
         {
          "columns":10,
          "firstgid":5429,
-         "image":"doors_lever_chest_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/doors_lever_chest_animation.png",
          "imageheight":240,
          "imagewidth":160,
          "margin":0,
@@ -13441,7 +13441,7 @@
         {
          "columns":24,
          "firstgid":5579,
-         "image":"Objects.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/Objects.png",
          "imageheight":144,
          "imagewidth":384,
          "margin":0,
@@ -13454,7 +13454,7 @@
         {
          "columns":13,
          "firstgid":5795,
-         "image":"trap_animation.png",
+         "image":"..\/..\/..\/..\/Mapas\/Tiled_files\/trap_animation.png",
          "imageheight":496,
          "imagewidth":208,
          "margin":0,

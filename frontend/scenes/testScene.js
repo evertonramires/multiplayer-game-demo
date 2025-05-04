@@ -24,7 +24,7 @@ export default class TestScene extends Phaser.Scene {
 
     this.load.tilemapTiledJSON("mapa", "assets/mapajson.json");
     this.load.image("tileset1", "assets/walls_floor.png");
-    this.load.image("tileset2", "assets/fireanimations2.png");
+    this.load.image("tileset2", "assets/fire_animation2.png");
     this.load.image("tileset3", "assets/decorative_cracks_floor.png");
   }
 
@@ -35,7 +35,7 @@ export default class TestScene extends Phaser.Scene {
     // Cria o mapa
     const map = this.make.tilemap({ key: "mapa" });
     const tilesetWalls = map.addTilesetImage("walls_floor", "tileset1");
-    const tilesetFire = map.addTilesetImage("fireanimations2", "tileset2");
+    const tilesetFire = map.addTilesetImage("fire_animation2", "tileset2");
     const tilesetDeco = map.addTilesetImage("cracked_tiles_floor", "tileset3");
 
     // Camadas
