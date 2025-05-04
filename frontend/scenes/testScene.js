@@ -18,56 +18,34 @@ export default class TestScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('hospital', 'assets/hospital.png');
-    this.load.image('wall', 'assets/wall.png');
     this.load.image('paciente', 'assets/pacienteGrave.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('nurse', 'assets/nurse.png', { frameWidth: 1, frameHeight: 1 });
+    this.load.spritesheet('dude', 'assets/doctor_sides.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('dude2', 'assets/doctor_updown.png', { frameWidth: 32, frameHeight: 48 });
+
+    this.load.tilemapTiledJSON("mapa", "assets/mapajson.json");
+    this.load.image("tileset1", "assets/walls_floor.png");
+    this.load.image("tileset2", "assets/fireanimations2.png");
+    this.load.image("tileset3", "assets/decorative_cracks_floor.png");
   }
 
   create() {
-    // Add background image stretched to fill the entire canvas
-    this.add.image(0, 0, 'hospital')
-      .setOrigin(0, 0)
-      .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    // const width = this.scale.width;
+    // const height = this.scale.height;
 
+    // Cria o mapa
+    const map = this.make.tilemap({ key: "mapa" });
+    const tilesetWalls = map.addTilesetImage("walls_floor", "tileset1");
+    const tilesetFire = map.addTilesetImage("fireanimations2", "tileset2");
+    const tilesetDeco = map.addTilesetImage("cracked_tiles_floor", "tileset3");
 
-    // Tamanho da tela (ajuste conforme sua config)
-    const width = this.scale.width;
-    const height = this.scale.height;
-    const wallThickness = 32; // largura constante da parede
-    const marginRight = 100;
+    // Camadas
+    // const backgroundLayer = map.createLayer("fundo", [tilesetWalls, tilesetDeco, tilesetFire], 0, 0);
+    const floorLayer = map.createLayer("Floor", tilesetWalls, 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    const collisionLayer = map.createLayer("Walls", [tilesetWalls, tilesetDeco], 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    const fireLayer = map.createLayer("Decos", [tilesetFire], 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-    // GRUPO DE PAREDES
-    this.walls = this.physics.add.staticGroup();
-
-    // PAREDE SUPERIOR
-    const topWall = this.physics.add.staticImage(0, wallThickness / 2, 'wall')
-      .setOrigin(0, 0.5)
-      .setDisplaySize(width - marginRight, wallThickness)
-      .refreshBody();
-    this.walls.add(topWall);
-
-    // PAREDE INFERIOR
-    const bottomWall = this.physics.add.staticImage(0, height - wallThickness / 2, 'wall')
-      .setOrigin(0, 0.5)
-      .setDisplaySize(width - marginRight, wallThickness)
-      .refreshBody();
-    this.walls.add(bottomWall);
-
-    // PAREDE ESQUERDA
-    const leftWall = this.physics.add.staticImage(wallThickness / 2, height / 2, 'wall')
-    .setDisplaySize(wallThickness, height)
-    .setOrigin(0.5)
-    .refreshBody();
-    this.walls.add(leftWall);
-
-    // PAREDE DIREITA
-    const rightWall = this.physics.add.staticImage(width - marginRight - wallThickness / 2, height / 2, 'wall')
-    .setDisplaySize(wallThickness, height)
-    .setOrigin(0.5)
-    .refreshBody();
-    this.walls.add(rightWall);
+    // Adiciona colisão às paredes
+    collisionLayer.setCollisionByProperty({ collides: true });
 
     // Patients
     this.patients = this.physics.add.group({
@@ -110,7 +88,7 @@ export default class TestScene extends Phaser.Scene {
 
     // Ensure things collide
     this.physics.add.collider(this.localPlayer, this.patients);
-    this.physics.add.collider(this.localPlayer, this.walls);
+    this.physics.add.collider(this.localPlayer, collisionLayer);
 
     // Calls Menu when player dies
     this.menuScreen = new Menu(
