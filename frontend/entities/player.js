@@ -96,10 +96,15 @@ tryInteract() {
       closestStation.receivePatient(this.heldObject);
       this.heldObject = null;
     } else {
-      // Solta o paciente normalmente
+      if (this.heldObject.currentStation) {
+        this.heldObject.currentStation.releasePatient();
+        this.heldObject.currentStation = null;
+      }
+
       this.heldObject.release();
       this.heldObject = null;
     }
+
   } else {
     // Procura por pacientes próximos
     let closestPatient = null;
