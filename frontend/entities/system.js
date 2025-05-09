@@ -19,6 +19,7 @@ class System {
   static playersList = [];
   static playersState = [];
   static allObjectsState = [];
+  static outBufferAllObjectsState = [];
 
   static engineConfig = {
     type: Phaser.WEBGL,
@@ -136,6 +137,8 @@ class System {
       const stateToSendString = JSON.stringify(stateToSend);
       System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
 
+
+      System.writeAllObjects();
       System.readAllObjects();
       // //console.log(System.allObjectsState)
 
@@ -183,32 +186,41 @@ class System {
 
   static async writeObject(object_id = "someone_forgot_object_id", x = 0, y = 0) {
 
-    // Only Write if elapsed enough time to not overlad the server
-    currentTime = Date.now();
-    elapsedTime = currentTime - gameStartTimestamp;
+    // Check if object_id already exists in the buffer
+    const existingObjectIndex = System.outBufferAllObjectsState.findIndex(obj => obj.object_id === object_id);
 
-    if (elapsedTime >= tickWindow_ms) {
-      // console.log(`Elapsed time overflow: ${elapsedTime}ms`);
-      console.log(`tick: ${elapsedTime}ms`);
-      gameStartTimestamp = currentTime; // Reset the start timestamp
-
-      //console.log("Writing object: ", object_id, x, y);
-
-      let payload = [
-        {
-          key: object_id,
-          collection: "scene_objects",
-          userId: "00000000-0000-0000-0000-000000000000",
-          value: { "x": x, "y": y },
-          permissionRead: 2,
-          permissionWrite: 1,
-        }
-      ]
-
-      // let recebido = await this.client.rpc(this.session, "manageobjects", payload);
-      //console.log(recebido);
+    if (existingObjectIndex !== -1) {
+      // Update the existing object's position
+      System.outBufferAllObjectsState[existingObjectIndex].position = { x: x, y: y };
+    } else {
+      // Add new object to the buffer
+      System.outBufferAllObjectsState.push({
+        object_id: object_id,
+        position: { x: x, y: y }
+      });
     }
   }
+
+  static async writeAllObjects() {
+
+    let payload = System.outBufferAllObjectsState.map(obj => ({
+      key: obj.object_id,
+      collection: "scene_objects",
+      userId: "00000000-0000-0000-0000-000000000000",
+      value: obj.position,
+      permissionRead: 2,
+      permissionWrite: 1,
+    }));
+
+    // Send the entire outBufferAllObjectsState to the server
+    let response = await this.client.rpc(this.session, "manageobjects", payload);
+    System.outBufferAllObjectsState = []; // Clear the buffer after sending
+
+    // Write all objects to the server
+    let recebido = await this.client.rpc(this.session, "manageobjects", payload);
+    //console.log(recebido);
+  }
+
 
   static async readAllObjects() {
 
