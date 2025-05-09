@@ -3,6 +3,11 @@ import * as nakamajs from "@heroiclabs/nakama-js";
 import config from "../config.json";
 import serverConfig from "../serverConfig.json";
 
+const tickWindow_ms = 20; //20 ms
+
+var currentTime = 0;
+var elapsedTime = 0;
+var gameStartTimestamp = 0;
 
 class System {
 
@@ -116,10 +121,25 @@ class System {
   }
 
   static async syncMatchStatus(stateToSend) {
-    // //console.log("Sending match state:");
-    // //console.log(state)
-    const stateToSendString = JSON.stringify(stateToSend);
-    System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
+
+    // Send and fetch match state every tickWindow_ms
+    currentTime = Date.now();
+    elapsedTime = currentTime - gameStartTimestamp;
+
+    if (elapsedTime >= tickWindow_ms) {
+      // console.log(`Elapsed time overflow: ${elapsedTime}ms`);
+      console.log(`tick: ${elapsedTime}ms`);
+      gameStartTimestamp = currentTime; // Reset the start timestamp
+
+      // //console.log("Sending match state:");
+      // //console.log(state)
+      const stateToSendString = JSON.stringify(stateToSend);
+      System.socket.sendMatchState(System.match.match_id, 1, stateToSendString);
+
+      System.readAllObjects();
+      // //console.log(System.allObjectsState)
+
+    }
 
     System.socket.onmatchdata = async (result) => {
       // //console.log("Received match state: \n");
@@ -154,31 +174,40 @@ class System {
         // //console.log("Updated players state: \n");
         // //console.log(System.playersState);
       }
-    };
+    }
 
-    System.readAllObjects();
-    // //console.log(System.allObjectsState)
+
 
   }
 
 
   static async writeObject(object_id = "someone_forgot_object_id", x = 0, y = 0) {
 
-    //console.log("Writing object: ", object_id, x, y);
+    // Only Write if elapsed enough time to not overlad the server
+    currentTime = Date.now();
+    elapsedTime = currentTime - gameStartTimestamp;
 
-    let payload = [
-      {
-        key: object_id,
-        collection: "scene_objects",
-        userId: "00000000-0000-0000-0000-000000000000",
-        value: { "x": x, "y": y },
-        permissionRead: 2,
-        permissionWrite: 1,
-      }
-    ]
+    if (elapsedTime >= tickWindow_ms) {
+      // console.log(`Elapsed time overflow: ${elapsedTime}ms`);
+      console.log(`tick: ${elapsedTime}ms`);
+      gameStartTimestamp = currentTime; // Reset the start timestamp
 
-    let recebido = await this.client.rpc(this.session, "manageobjects", payload);
-    //console.log(recebido);
+      //console.log("Writing object: ", object_id, x, y);
+
+      let payload = [
+        {
+          key: object_id,
+          collection: "scene_objects",
+          userId: "00000000-0000-0000-0000-000000000000",
+          value: { "x": x, "y": y },
+          permissionRead: 2,
+          permissionWrite: 1,
+        }
+      ]
+
+      // let recebido = await this.client.rpc(this.session, "manageobjects", payload);
+      //console.log(recebido);
+    }
   }
 
   static async readAllObjects() {
@@ -194,12 +223,12 @@ class System {
       }
     ]
 
-    let response  = await this.client.rpc(this.session, "manageobjects", payload);
+    let response = await this.client.rpc(this.session, "manageobjects", payload);
     // //console.log(response);
     // let parsedResponse = JSON.parse(response);
     // //console.log(parsedResponse);
 
-    System.allObjectsState =  response.payload.objects;
+    System.allObjectsState = response.payload.objects;
     // //console.log(System.allObjectsState);
   }
 
@@ -226,12 +255,15 @@ class System {
       }
     } catch (error) {
       if (this.config.debug.verbose) //console.error("Authentication failed:", error);
-      throw error;
+        throw error;
     }
 
     this.socket = this.client.createSocket();
     await this.socket.connect(this.session, true);
     //console.log("Socket connected:", this.socket);
+
+    gameStartTimestamp = Date.now();
+    console.log("Game started at:", new Date(gameStartTimestamp).toLocaleString());
   }
 
   static async createUser() {
@@ -248,7 +280,7 @@ class System {
       }
     } catch (error) {
       if (this.config.debug.verbose) //console.error("Authentication failed:", error);
-      throw error;
+        throw error;
     }
 
   }
