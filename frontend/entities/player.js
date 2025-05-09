@@ -76,21 +76,48 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  tryInteract() {
-    if (this.heldObject) {
-        // Solta o objeto se já estiver segurando algo
-        this.heldObject.release();
-        this.heldObject = null;
-    } else {
-        // Procura por objetos seguráveis próximos
-        this.patients.getChildren().forEach(obj => {
-            if (Phaser.Math.Distance.Between(this.x, this.y, obj.x, obj.y) < 50) {
-                this.heldObject = obj;
-                obj.beHeldBy(this);
-                return;
-            }
-        });
+tryInteract() {
+  if (this.heldObject) {
+    // Verifica se há uma estação próxima para encaixar o paciente
+    let closestStation = null;
+    let closestDistance = 50;
+
+    if (this.scene.stations) {
+      this.scene.stations.getChildren().forEach(station => {
+        const distance = Phaser.Math.Distance.Between(this.x, this.y, station.x, station.y);
+        if (distance < closestDistance && station.canReceivePatient()) {
+          closestStation = station;
+          closestDistance = distance;
+        }
+      });
     }
+
+    if (closestStation) {
+      closestStation.receivePatient(this.heldObject);
+      this.heldObject = null;
+    } else {
+      // Solta o paciente normalmente
+      this.heldObject.release();
+      this.heldObject = null;
+    }
+  } else {
+    // Procura por pacientes próximos
+    let closestPatient = null;
+    let closestDistance = 50;
+
+    this.patients.getChildren().forEach(obj => {
+      const distance = Phaser.Math.Distance.Between(this.x, this.y, obj.x, obj.y);
+      if (distance < closestDistance) {
+        closestPatient = obj;
+        closestDistance = distance;
+      }
+    });
+
+    if (closestPatient) {
+      this.heldObject = closestPatient;
+      closestPatient.beHeldBy(this);
+    }
+  }
 }
 
   update() {

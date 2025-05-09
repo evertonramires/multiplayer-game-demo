@@ -6,6 +6,7 @@ import Menu from "../entities/menu";
 import Hud from "../entities/hud";
 import System from "../entities/system";
 import Patients from "../entities/patients";
+import Station from "../entities/station";
 
 export default class TestScene extends Phaser.Scene {
 
@@ -22,10 +23,11 @@ export default class TestScene extends Phaser.Scene {
     this.load.spritesheet('dude', 'assets/doctor_sides.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('dude2', 'assets/doctor_updown.png', { frameWidth: 32, frameHeight: 48 });
 
-    this.load.tilemapTiledJSON("mapa", "assets/mapajson.json");
-    this.load.image("tileset1", "assets/walls_floor.png");
-    this.load.image("tileset2", "assets/fire_animation2.png");
-    this.load.image("tileset3", "assets/decorative_cracks_floor.png");
+    this.load.tilemapTiledJSON("mapa", "assets/mapas/mapajson.json");
+    this.load.image("tileset1", "assets/mapas/walls_floor.png");
+    this.load.image("tileset2", "assets/mapas/fire_animation2.png");
+    this.load.image("tileset3", "assets/mapas/decorative_cracks_floor.png");
+    this.load.image("tileset4", "assets/mapas/pedestals.png");
   }
 
   create() {
@@ -37,16 +39,36 @@ export default class TestScene extends Phaser.Scene {
     const tilesetWalls = map.addTilesetImage("walls_floor", "tileset1");
     const tilesetFire = map.addTilesetImage("fire_animation2", "tileset2");
     const tilesetDeco = map.addTilesetImage("cracked_tiles_floor", "tileset3");
+    const tilesetStation = map.addTilesetImage("pedestals", "tileset4");
 
     // Camadas
-    // const backgroundLayer = map.createLayer("fundo", [tilesetWalls, tilesetDeco, tilesetFire], 0, 0);
     const floorLayer = map.createLayer("Floor", tilesetWalls, 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
     const collisionLayer = map.createLayer("Walls", [tilesetWalls, tilesetDeco], 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
     const fireLayer = map.createLayer("Decos", [tilesetFire], 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    const stationLayer = map.createLayer("Station", [tilesetStation], 0, 0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
     // Adiciona colisão às paredes
     collisionLayer.setCollisionByProperty({ collides: true });
 
+    //Station
+    this.stationTiles = [];
+
+    this.stations = this.physics.add.group({
+      classType: Station,
+      runChildUpdate: true
+    });
+
+    if (stationLayer) {
+      stationLayer.forEachTile(tile => {
+        if (tile.properties?.station) {
+          const worldX = tile.getCenterX();
+          const worldY = tile.getCenterY();
+          const station = new Station(this, worldX, worldY);
+          this.stations.add(station);
+        }
+      });
+    }
+    
     // Patients
     this.patients = this.physics.add.group({
       classType: Patients,
@@ -66,6 +88,7 @@ export default class TestScene extends Phaser.Scene {
     }
 
     this.localPlayer = new Player(this, 100, 500, 'dude');
+    // this.localPlayer.setDepth(10);
 
     //spawn 10 remote player bodies in a hidden place to be assigned to remote players if they join match
     this.remotePlayersBody = [];
@@ -101,6 +124,8 @@ export default class TestScene extends Phaser.Scene {
       }
     );
     this.menuScreen.setVisible(false);
+
+
   }
 
   async update() {
