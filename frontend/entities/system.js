@@ -39,7 +39,7 @@ class System {
     try {
       const matchName = "NoImpostersAllowed";
       System.match = await System.socket.createMatch(matchName);
-      // //console.log("Match created:", System.match);
+      console.log("Match created:", System.match);
     } catch (error) {
       // //console.error("Failed to create match:", error);
     }
@@ -81,7 +81,8 @@ class System {
       //console.log("Joining match: ", firstFoundMatch.match_id);
       const joined = await System.joinMatch(firstFoundMatch.match_id);
       if (joined) {
-        //console.log("OK! --- Auto joined match: ", firstFoundMatch.match_id);
+        console.log("OK! --- Auto joined match: ", firstFoundMatch.match_id);
+        console.log(firstFoundMatch);
         return true;
       }
     }
@@ -123,13 +124,20 @@ class System {
 
   static async syncMatchStatus(stateToSend) {
 
+    // if (System.match && System.match.self) {
+    //   console.log("Match created by:", System.match.self.username);
+    //   console.log(System.match.self.user_id);
+    // } else {
+    //   console.log("Match creator information not available.");
+    // }
+
     // Send and fetch match state every tickWindow_ms
     currentTime = Date.now();
     elapsedTime = currentTime - gameStartTimestamp;
 
     if (elapsedTime >= tickWindow_ms) {
       // console.log(`Elapsed time overflow: ${elapsedTime}ms`);
-      console.log(`tick: ${elapsedTime}ms`);
+      // console.log(`tick: ${elapsedTime}ms`);
       gameStartTimestamp = currentTime; // Reset the start timestamp
 
       // //console.log("Sending match state:");
@@ -150,7 +158,7 @@ class System {
       const remoteData = result.data ? result.data : null;
       const remoteId = result.presence.user_id ? result.presence.user_id : null;
       const remoteName = result.presence.username ? result.presence.username : null;
-      // //console.log("Received from: ", remoteId, remoteName);
+      //console.log("Received from: ", remoteId, remoteName);
 
       if (remoteData) {
 
