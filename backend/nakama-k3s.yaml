@@ -1,0 +1,189 @@
+########################################
+# 1. Postgres Deployment + Service
+########################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        fsGroup: 999
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: postgres
+          image: postgres:12.2-alpine
+          args:
+            - "postgres"
+            - "-c"
+            - "shared_preload_libraries=pg_stat_statements"
+            - "-c"
+            - "pg_stat_statements.track=all"
+          env:
+            - name: POSTGRES_DB
+              value: "nakama"
+            - name: POSTGRES_PASSWORD
+              value: "localdb"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pgdata
+          hostPath:
+            path: /home/everton/k3s/nakama/postgres # Adjust for your own system
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+
+########################################
+# 2. Nakama runtime config (ConfigMap)
+########################################
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nakama-config
+data:
+  local.yml: |
+    logger:
+      level: "DEBUG"
+    runtime:
+      js_entrypoint: "build/index.js"
+
+########################################
+# 3. Nakama Deployment + Service
+########################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nakama
+  labels:
+    app: nakama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nakama
+  template:
+    metadata:
+      labels:
+        app: nakama
+    spec:
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+
+      # Wait until Postgres answers
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:12.2-alpine
+          command:
+            - sh
+            - -c
+            - |
+              for i in $(seq 1 60); do
+                pg_isready -h postgres -p 5432 -U postgres && exit 0
+                sleep 2
+              done
+              exit 1
+
+      containers:
+        - name: nakama
+          image: gypsyrobot/nakamats:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ecx
+            - >
+              /nakama/nakama migrate up
+              --database.address postgres:localdb@postgres:5432/nakama?sslmode=disable &&
+              exec /nakama/nakama
+              --config /nakama/data/local.yml
+              --database.address postgres:localdb@postgres:5432/nakama?sslmode=disable
+          ports:
+            - name: grpc
+              containerPort: 7349
+            - name: http
+              containerPort: 7350
+            - name: console
+              containerPort: 7351
+          volumeMounts:
+            - name: nakama-cfg
+              mountPath: /nakama/data/local.yml
+              subPath: local.yml
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthcheck      # <- fixed
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /healthcheck      # <- fixed
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 8
+      volumes:
+        - name: nakama-cfg
+          configMap:
+            name: nakama-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nakama
+spec:
+  type: NodePort
+  selector:
+    app: nakama
+  ports:
+    - name: grpc
+      port: 7349
+      targetPort: 7349
+      nodePort: 31349
+      protocol: TCP
+    - name: http
+      port: 7350
+      targetPort: 7350
+      nodePort: 31350
+      protocol: TCP
+    - name: console
+      port: 7351
+      targetPort: 7351
+      nodePort: 31351
+      protocol: TCP
